@@ -1,3 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NeMiro.Application\NeMiro.Application.csproj" />
+    <ProjectReference Include="..\NeMiro.Models\NeMiro.Models.csproj" />
+  </ItemGroup>
 </Project>
