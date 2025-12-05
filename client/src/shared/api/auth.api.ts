@@ -1,11 +1,12 @@
+import { TelegramAuthData } from 'node_modules/@telegram-auth/react/dist/cjs';
 import { axiosInstance } from '../instance/axios.instance';
 import { User } from '../interfaces/user.interface';
 
 export const loginUser = async (
- user: Omit<User, 'id' | 'createdAt'>,
+ authData: TelegramAuthData,
 ): Promise<User | null> => {
  try {
-  const res = await axiosInstance.post<User>('/api/v1/users', user);
+  const res = await axiosInstance.post<User>('/api/v1/auth', authData);
   return res.data;
  } catch (err) {
   console.error(err);

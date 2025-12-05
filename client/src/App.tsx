@@ -1,17 +1,13 @@
-import { LoginButton } from '@telegram-auth/react';
-import { BOT_USERNAME } from './shared/constants';
+import { Header } from './components/header';
+import { Toolbar } from './components/toolbar';
 
 function App() {
- return (
-  <div className="App">
-   <LoginButton
-    botUsername={BOT_USERNAME}
-    onAuthCallback={data => {
-     console.log(data);
-    }}
-   />
-  </div>
- );
+  return (
+    <div className='h-fit bg-white'>
+      <Header />
+      <Toolbar />
+    </div>
+  );
 }
 
 export default App;
