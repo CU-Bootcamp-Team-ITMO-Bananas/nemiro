@@ -13,42 +13,42 @@ public class Initial : Migration
             CREATE TABLE users
             (
                 id                  BIGINT               PRIMARY KEY,
-                telegram               BIGINT                  UNIQUE NOT NULL,
-                username            VARCHAR(100)            NOT NULL,
-                profile_picture_url VARCHAR(255),
-                created_at          TIMESTAMPTZ             NOT NULL DEFAULT NOW()
+                telegram            BIGINT               UNIQUE NOT NULL,
+                username            VARCHAR(100)         NOT NULL,
+                created_at          TIMESTAMPTZ          NOT NULL DEFAULT NOW(),
+                avatar              VARCHAR(255)
             );
 
             -- Доски (boards)
             CREATE TABLE boards
             (
-                id          VARCHAR(255)            PRIMARY KEY,
-                owner_id    BIGINT                  REFERENCES users(id) ON DELETE SET NULL,
-                created_at  TIMESTAMPTZ             NOT NULL DEFAULT NOW(),
-                updated_at  TIMESTAMPTZ             NOT NULL DEFAULT NOW()
+                id                  VARCHAR(255)            PRIMARY KEY,
+                owner_id            BIGINT                  REFERENCES users(id) ON DELETE SET NULL,
+                created_at          TIMESTAMPTZ             NOT NULL DEFAULT NOW(),
+                updated_at          TIMESTAMPTZ             NOT NULL DEFAULT NOW()
             );
 
-            -- Стикеры (stickers)
-            CREATE TABLE stickers
+            -- Элементы (elements)
+            CREATE TABLE elements
             (
-                id          BIGINT               PRIMARY KEY,
-                board_id    VARCHAR(255)            NOT NULL REFERENCES boards(id) ON DELETE CASCADE,
-                content     JSONB,
-                created_at  TIMESTAMPTZ             NOT NULL DEFAULT NOW(),
-                updated_at  TIMESTAMPTZ             NOT NULL DEFAULT NOW()
+                id                  BIGINT               PRIMARY KEY,
+                board_id            VARCHAR(255)         NOT NULL REFERENCES boards(id) ON DELETE CASCADE,
+                created_at          TIMESTAMPTZ          NOT NULL DEFAULT NOW(),
+                updated_at          TIMESTAMPTZ          NOT NULL DEFAULT NOW(),
+                content             JSONB
             );
 
             -- Индексы
             CREATE INDEX idx_users_tg_id ON users(telegram);
             CREATE INDEX idx_boards_owner_id ON boards(owner_id) WHERE owner_id IS NOT NULL;
-            CREATE INDEX idx_stickers_board_id ON stickers(board_id);
-            CREATE INDEX idx_stickers_created_at ON stickers(created_at DESC);
+            CREATE INDEX idx_elements_board_id ON elements(board_id);
+            CREATE INDEX idx_elements_created_at ON elements(created_at DESC);
             """);
     }
 
     public override void Down()
     {
-        Delete.Table("stickers");
+        Delete.Table("elements");
         Delete.Table("boards");
         Delete.Table("users");
     }
