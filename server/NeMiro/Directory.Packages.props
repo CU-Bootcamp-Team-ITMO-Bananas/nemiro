@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.0.0"/>
+    <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="7.0.0"/>
+    <PackageVersion Include="Swashbuckle.AspNetCore.Swagger" Version="7.0.0"/>
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.0.0"/>
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="7.0.0"/>
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0"/>
+    <PackageVersion Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="9.0.0"/>
+
+    <!-- Остальные -->
+    <PackageVersion Include="System.Linq.Async" Version="6.0.1"/>
+    <PackageVersion Include="Scrutor" Version="6.0.1"/>
+  </ItemGroup>
+</Project>
