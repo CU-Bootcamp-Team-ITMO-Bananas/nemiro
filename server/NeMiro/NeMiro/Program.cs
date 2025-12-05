@@ -1,13 +1,25 @@
+using FluentMigrator.Runner;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NeMiro.Infrastructure.Extensions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services
-    .AddControllers();
+var configuration = builder.Configuration;
+
+builder.Services.AddInfrastructure(configuration);
+
+builder.Services.AddControllers();
 
 WebApplication app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var migrator = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+
+    migrator.MigrateUp();
+}
 
 if (app.Environment.IsDevelopment())
 {
