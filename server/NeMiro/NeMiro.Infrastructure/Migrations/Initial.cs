@@ -48,5 +48,8 @@ public class Initial : Migration
 
     public override void Down()
     {
+        Delete.Table("stickers");
+        Delete.Table("boards");
+        Delete.Table("users");
     }
 }
