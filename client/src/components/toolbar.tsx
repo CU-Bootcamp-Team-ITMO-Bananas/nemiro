@@ -1,8 +1,9 @@
 import { BOT_USERNAME } from '@/shared/constants';
 import { useAuthStore } from '@/shared/stores/auth.store';
 import { LoginButton } from '@telegram-auth/react';
-import { Avatar } from './avatar';
 import { Logo } from './logo';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Spinner } from './ui/spinner';
 
 export const Toolbar = () => {
   const { login, isLoggedIn, user } = useAuthStore();
@@ -10,10 +11,33 @@ export const Toolbar = () => {
   return (
     <div className='pt-4 px-4 flex justify-between'>
       <Logo />
-      <div className='flex items-center'>
-        <div className='bg-white'>
+      <div className='flex items-center gap-5'>
+        <Spinner />
+        <div>
           {isLoggedIn && user ? (
-            <Avatar uri={user.avatar ?? ''} />
+            <div className='*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale'>
+              <Avatar>
+                <AvatarImage
+                  src='https://github.com/shadcn.png'
+                  alt='@shadcn'
+                />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+              <Avatar>
+                <AvatarImage
+                  src='https://github.com/maxleiter.png'
+                  alt='@maxleiter'
+                />
+                <AvatarFallback>LR</AvatarFallback>
+              </Avatar>
+              <Avatar>
+                <AvatarImage
+                  src='https://github.com/evilrabbit.png'
+                  alt='@evilrabbit'
+                />
+                <AvatarFallback>ER</AvatarFallback>
+              </Avatar>
+            </div>
           ) : (
             <LoginButton
               buttonSize='large'
