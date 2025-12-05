@@ -2,6 +2,7 @@ using FluentMigrator.Runner;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NeMiro.Application.Extensions;
 using NeMiro.Infrastructure.Extensions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -10,7 +11,9 @@ var configuration = builder.Configuration;
 
 builder.Services.AddInfrastructure(configuration);
 
-builder.Services.AddControllers();
+builder.Services
+    .AddServices()
+    .AddControllers();
 
 WebApplication app = builder.Build();
 

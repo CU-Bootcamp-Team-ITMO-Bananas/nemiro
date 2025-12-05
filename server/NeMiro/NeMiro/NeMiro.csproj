@@ -8,6 +8,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NeMiro.Application\NeMiro.Application.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NeMiro.Infrastructure\NeMiro.Infrastructure.csproj" />
