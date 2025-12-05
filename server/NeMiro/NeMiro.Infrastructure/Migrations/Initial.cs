@@ -38,7 +38,7 @@ public class Initial : Migration
                 updated_at  TIMESTAMPTZ             NOT NULL DEFAULT NOW()
             );
 
-            -- Индексы для производительности
+            -- Индексы
             CREATE INDEX idx_users_tg_id ON users(telegram);
             CREATE INDEX idx_boards_owner_id ON boards(owner_id) WHERE owner_id IS NOT NULL;
             CREATE INDEX idx_stickers_board_id ON stickers(board_id);

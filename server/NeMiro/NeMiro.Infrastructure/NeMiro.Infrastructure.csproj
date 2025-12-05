@@ -3,6 +3,7 @@
     <PackageReference Include="FluentMigrator" />
     <PackageReference Include="FluentMigrator.Abstractions" />
     <PackageReference Include="FluentMigrator.Runner" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="Npgsql" />
   </ItemGroup>
 </Project>
