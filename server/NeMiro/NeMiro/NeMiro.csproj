@@ -12,4 +12,7 @@
     <ProjectReference Include="..\NeMiro.Application\NeMiro.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\NeMiro.Infrastructure\NeMiro.Infrastructure.csproj" />
+  </ItemGroup>
 </Project>

@@ -1,0 +1,55 @@
+using FluentMigrator;
+
+namespace NeMiro.Infrastructure.Migrations;
+
+[Migration(1731949849, "initial")]
+public class Initial : Migration
+{
+    public override void Up()
+    {
+        Execute.Sql(
+            """
+            -- Пользователи
+            CREATE TABLE users
+            (
+                id                  BIGINT               PRIMARY KEY,
+                telegram            BIGINT               UNIQUE NOT NULL,
+                username            VARCHAR(100)         NOT NULL,
+                created_at          TIMESTAMPTZ          NOT NULL DEFAULT NOW(),
+                avatar              VARCHAR(255)
+            );
+
+            -- Доски (boards)
+            CREATE TABLE boards
+            (
+                id                  VARCHAR(255)            PRIMARY KEY,
+                owner_id            BIGINT                  REFERENCES users(id) ON DELETE SET NULL,
+                created_at          TIMESTAMPTZ             NOT NULL DEFAULT NOW(),
+                updated_at          TIMESTAMPTZ             NOT NULL DEFAULT NOW()
+            );
+
+            -- Элементы (elements)
+            CREATE TABLE elements
+            (
+                id                  BIGINT               PRIMARY KEY,
+                board_id            VARCHAR(255)         NOT NULL REFERENCES boards(id) ON DELETE CASCADE,
+                created_at          TIMESTAMPTZ          NOT NULL DEFAULT NOW(),
+                updated_at          TIMESTAMPTZ          NOT NULL DEFAULT NOW(),
+                content             JSONB
+            );
+
+            -- Индексы
+            CREATE INDEX idx_users_tg_id ON users(telegram);
+            CREATE INDEX idx_boards_owner_id ON boards(owner_id) WHERE owner_id IS NOT NULL;
+            CREATE INDEX idx_elements_board_id ON elements(board_id);
+            CREATE INDEX idx_elements_created_at ON elements(created_at DESC);
+            """);
+    }
+
+    public override void Down()
+    {
+        Delete.Table("elements");
+        Delete.Table("boards");
+        Delete.Table("users");
+    }
+}
