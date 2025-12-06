@@ -27,7 +27,7 @@ builder.Services
     .AddServices()
     .AddControllers();
 
-builder.Services.AddEndpointsApiExplorer(); // Добавьте эту строку
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
                                {
                                    c.SwaggerDoc(
