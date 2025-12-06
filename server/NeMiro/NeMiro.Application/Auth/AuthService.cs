@@ -22,6 +22,7 @@ public class AuthService(IUserRepository userRepository) : IAuthService
             Username = request.UserName,
             Avatar = request.PhotoUrl,
             Telegram = request.Id,
+            Id = request.Id,
         };
 
         await userRepository.Create(newUser, cancellationToken);
