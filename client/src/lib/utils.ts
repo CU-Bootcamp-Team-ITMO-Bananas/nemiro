@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { HubConnection } from '@microsoft/signalr/dist/esm/HubConnection';
 import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import { API_URL } from '@/shared/constants';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -9,7 +10,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function buildConnection(boardId: string): HubConnection {
   const connection = new HubConnectionBuilder()
-    .withUrl(`https://localhost:7100/board/${boardId}`)
+    .withUrl(`${API_URL}/board/${boardId}`)
     .withAutomaticReconnect()
     .configureLogging(LogLevel.Information)
     .build();

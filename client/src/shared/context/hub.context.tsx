@@ -11,16 +11,25 @@ import {
 interface IHubContext {
   connection: HubConnection | null;
   connectionStarted: boolean;
+  subscribe: (
+    event: string,
+    callback: (...args: unknown[]) => void,
+    signal?: AbortSignal
+  ) => () => void;
+  emit: (event: string, ...args: unknown[]) => void;
 }
 
 const HubContext = createContext<IHubContext>({
   connection: null,
   connectionStarted: false,
+  subscribe:
+    (event: string, callback: (...args: unknown[]) => void) => () => {},
+  emit: (event: string, ...args: unknown[]) => {},
 });
 
 export const HubContextProvider = ({
   children,
-  boardId
+  boardId,
 }: {
   children: ReactNode;
   boardId: string;
@@ -49,15 +58,48 @@ export const HubContextProvider = ({
     }
   }, [connection]);
 
+  const subscribe = (
+    event: string,
+    callback: (...args: unknown[]) => void,
+    signal?: AbortSignal
+  ) => {
+    if (signal?.aborted) {
+      return () => {};
+    }
+
+    const loggingCallback = (data: unknown) => {
+      console.info(`[socket] < ${event}`, data);
+      callback(data);
+    };
+
+    connection?.on(event, loggingCallback);
+
+    const unsubscribe = () => {
+      connection?.off(event, loggingCallback);
+      signal?.removeEventListener('abort', unsubscribe);
+    };
+
+    signal?.addEventListener('abort', unsubscribe, { once: true });
+
+    return unsubscribe;
+  };
+
+  const emit = (event: string, data: unknown) => {
+    console.info(`[socket] > ${event}`, data);
+    connection?.invoke(event, data);
+  };
+
   return (
-    <HubContext.Provider value={{ connection, connectionStarted }}>
+    <HubContext.Provider
+      value={{ emit, subscribe, connection, connectionStarted }}
+    >
       {children}
     </HubContext.Provider>
   );
 };
 
 export const useHub = () => {
-  const { connection, connectionStarted } = useContext(HubContext);
-
-  return { connection, connectionStarted };
+  const { emit, subscribe, connection, connectionStarted } =
+    useContext(HubContext);
+  return { emit, subscribe, connection, connectionStarted };
 };

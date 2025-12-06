@@ -6,7 +6,7 @@ export const loginUser = async (
  authData: TelegramAuthData,
 ): Promise<User | null> => {
  try {
-  const res = await axiosInstance.post<User>('/api/v1/auth', authData);
+  const res = await axiosInstance.post<User>('auth', authData);
   return res.data;
  } catch (err) {
   console.error(err);

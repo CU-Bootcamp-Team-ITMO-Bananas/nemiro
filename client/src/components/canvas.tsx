@@ -1,16 +1,17 @@
 import { useHub } from '@/shared/context/hub.context';
+import { useEffect } from 'react';
 
 export const Canvas = () => {
-  const { connection, connectionStarted } = useHub();
+  const { subscribe, emit } = useHub();
 
-  return (
-    <div className='relative w-full h-screen bg-gray-100'>
-      <canvas
-        // ref={canvasRef}
-        width={window.innerWidth}
-        height={window.innerHeight}
-        className='absolute top-0 left-0'
-      />
-    </div>
-  );
+  useEffect(() => {
+    const abortController = new AbortController();
+    subscribe('board_event', (lo) => console.log(lo), abortController.signal);
+
+    return () => {
+      abortController.abort();
+    };
+  }, []);
+
+  return <div className='relative w-full h-screen bg-gray-100'></div>;
 };
