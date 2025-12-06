@@ -101,4 +101,12 @@ public class BoardHub : Hub
 
         await _elementService.UpdateElement(element, boardId, cancellationToken);
     }
+
+    public async Task DeleteElement(ElementDto element)
+    {
+        var httpContext = Context.GetHttpContext();
+        var cancellationToken = httpContext.RequestAborted;
+        var boardId = Context.Items["board_id"] as string;
+        await _elementService.DeleteElement(element, boardId, cancellationToken);
+    }
 }
