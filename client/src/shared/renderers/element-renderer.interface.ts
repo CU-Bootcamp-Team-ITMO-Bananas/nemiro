@@ -1,4 +1,5 @@
 import { BoardElement } from '../interfaces/board/board-element.interface';
+import { Board } from '../interfaces/board/board.interface';
 import { ReactNode } from 'react';
 
 export interface ElementRendererProps {
@@ -7,6 +8,12 @@ export interface ElementRendererProps {
   onDelete?: (elementId: string) => void;
   isSelected?: boolean;
   onSelect?: () => void;
+}
+
+export interface ElementRendererConfigPanelProps {
+  element: BoardElement;
+  board: Board;
+  onUpdate: (element: BoardElement) => void;
 }
 
 export interface ElementRenderer {
@@ -19,5 +26,10 @@ export interface ElementRenderer {
    * Рендерит элемент
    */
   render: (props: ElementRendererProps) => ReactNode;
+  
+  /**
+   * Рендерит панель конфигурации для элемента (опционально)
+   */
+  renderConfigPanel?: (props: ElementRendererConfigPanelProps) => ReactNode;
 }
 
