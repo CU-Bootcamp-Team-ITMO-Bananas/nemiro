@@ -17,12 +17,12 @@ public class AuthService(IUserRepository userRepository) : IAuthService
             return existingUser;
         }
 
-        var newUser = new User(
-            Id: request.Id,
-            Username: request.FirstName,
-            Avatar: request.PhotoUrl,
-            Telegram: request.Id
-        );
+        var newUser = new User
+        {
+            Username = request.UserName,
+            Avatar = request.PhotoUrl,
+            Telegram = request.Id,
+        };
 
         await userRepository.Create(newUser, cancellationToken);
 

@@ -7,5 +7,5 @@ namespace NeMiro.Infrastructure.Repositories.Users;
 public interface IUserRepository
 {
     Task<User?> GetUserAsync(long userId, CancellationToken cancellationToken);
-    Task Create(User user, CancellationToken cancellationToken);
+    Task<long> Create(User user, CancellationToken cancellationToken);
 }
