@@ -2,10 +2,8 @@ import { useAuthStore } from '@/shared/stores/auth.store';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Login } from '@/components/header/login-button';
 import { Logo } from '@/components/header/logo';
-import { LoadingSpinner } from '@/components/header/loading-spinner';
 import { ShareButton } from '@/components/header/share-button';
 import { People } from '@/components/header/people';
-import { AvailableBoardsButton } from '@/components/header/available-boards-button';
 
 interface HeaderProps {
   isShareModalOpen: boolean;

@@ -89,6 +89,11 @@ export const Canvas = () => {
     };
   }, [connection, subscribe, updateBoard]);
 
+  // Находим выбранный элемент и его renderer
+  const selectedElement = board?.elements.find(
+    (el) => el.id === selectedElementId
+  );
+
   // Обработка удаления выбранного элемента по Backspace
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -103,10 +108,10 @@ export const Canvas = () => {
       }
 
       // Backspace - удаляет выбранный элемент
-      if (e.key === 'Backspace' && selectedElementId) {
+      if (e.key === 'Backspace' && selectedElement) {
         e.preventDefault();
         e.stopPropagation();
-        removeElement(selectedElementId);
+        onDeleteElement(selectedElement);
         setSelectedElementId(null);
       }
     };
@@ -120,11 +125,6 @@ export const Canvas = () => {
   const getUserById = (userId: number): User | null => {
     return board?.users.find((u) => u.id == userId) ?? null;
   };
-
-  // Находим выбранный элемент и его renderer
-  const selectedElement = board?.elements.find(
-    (el) => el.id === selectedElementId
-  );
 
   const selectedElementRenderer = selectedElement
     ? findRenderer(selectedElement)

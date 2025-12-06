@@ -18,7 +18,7 @@ interface AuthState {
 
 export const anonymousUser = (): User => {
   return {
-    id: Math.random() * 10 ** 5,
+    id: Math.floor(Math.random() * 10 ** 5),
     username: uniqueNamesGenerator({
       dictionaries: [names, adjectives, animals],
       length: 2,
