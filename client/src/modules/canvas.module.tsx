@@ -3,11 +3,12 @@ import { useStageZoomPan } from '@/shared/hooks/useStageZoomPan';
 import { Board } from '@/shared/interfaces/board/board.interface';
 import { PointerUpdateEvent } from '@/shared/interfaces/events/pointer-update-event.interface';
 import { useBoardStore } from '@/shared/stores/board.store';
-import { useCallback, useEffect, useRef } from 'react';
-import { Stage, Layer, Rect, Circle, Group } from 'react-konva';
+import { findRenderer } from '@/shared/renderers/element-renderer.registry';
+import { useCallback, useEffect, useRef, Fragment } from 'react';
+import { Stage, Layer, Circle, Group } from 'react-konva';
 
 export const Canvas = () => {
-  const { board, updateBoard } = useBoardStore();
+  const { board, updateBoard, updateElement, removeElement } = useBoardStore();
   const { subscribe, emit, connection } = useHub();
   const {
     stageRef,
@@ -85,6 +86,7 @@ export const Canvas = () => {
     return colors[userId % colors.length];
   };
 
+
   return (
     <div
       onMouseMove={handleMouseMove}
@@ -138,11 +140,44 @@ export const Canvas = () => {
             );
           })}
         </Layer>
-        <Layer>
-          <Rect x={20} y={50} width={100} height={100} fill='red' draggable />
-          <Circle x={200} y={100} radius={50} fill='green' draggable />
-        </Layer>
       </Stage>
+
+      <div className='absolute inset-0 pointer-events-none overflow-hidden'>
+        <div 
+          className='relative w-full h-full' 
+          style={{ 
+            pointerEvents: 'auto',
+            transform: `translate(${stagePos.x}px, ${stagePos.y}px) scale(${stageScale})`,
+            transformOrigin: '0 0',
+          }}
+        >
+          {board?.elements
+            .slice()
+            .sort((a, b) => a.zIndex - b.zIndex)
+            .map((element) => {
+              const renderer = findRenderer(element);
+              if (!renderer) {
+                console.warn(`No renderer found for element: ${element.id}`);
+                return null;
+              }
+
+              return (
+                <Fragment key={element.id}>
+                  {renderer.render({
+                    element,
+                    isSelected: false,
+                    onUpdate: (updatedElement) => {
+                      updateElement(updatedElement);
+                    },
+                    onDelete: (elementId) => {
+                      removeElement(elementId);
+                    },
+                  })}
+                </Fragment>
+              );
+            })}
+        </div>
+      </div>
     </div>
   );
 };
