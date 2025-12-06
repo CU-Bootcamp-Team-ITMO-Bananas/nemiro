@@ -29,11 +29,12 @@ public class UserRepository(NpgsqlDataSource dataSource) : IUserRepository
                 cancellationToken: cancellationToken));
     }
 
-    public async Task Create(User user, CancellationToken cancellationToken)
+    public async Task<long> Create(User user, CancellationToken cancellationToken)
     {
         const string sql = """
                            INSERT INTO users (telegram, username, created_at, avatar)
                            VALUES (@Telegram, @Username, @CreatedAt, @Avatar)
+                           RETURNING id
                            """;
 
         await using var connection = await dataSource.OpenConnectionAsync(cancellationToken);
@@ -46,10 +47,12 @@ public class UserRepository(NpgsqlDataSource dataSource) : IUserRepository
             Avatar = user.Avatar,
         };
 
-        await connection.ExecuteAsync(
+        var id = await connection.QuerySingleAsync<long>(
             new CommandDefinition(
                 sql,
                 parameters,
                 cancellationToken: cancellationToken));
+
+        return id;
     }
 }
