@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -55,5 +57,32 @@ public class BoardRepository(NpgsqlDataSource dataSource) : IBoardRepository
                     Id = id,
                 },
                 cancellationToken: cancellationToken));
+    }
+
+    public async Task<IReadOnlyCollection<Board>> GetBoardsByUserId(long userId, CancellationToken cancellationToken)
+    {
+        const string sql = """
+                           SELECT
+                               id as Id,
+                               owner_id as OwnerId,
+                               created_at as CreatedAt,
+                               updated_at as UpdatedAt
+                           FROM boards
+                           WHERE owner_id = @UserId
+                           ORDER BY created_at DESC
+                           """;
+
+        await using var connection = await dataSource.OpenConnectionAsync(cancellationToken);
+
+        var boards = await connection.QueryAsync<Board>(
+            new CommandDefinition(
+                sql,
+                new
+                {
+                    UserId = userId,
+                },
+                cancellationToken: cancellationToken));
+
+        return boards.ToList();
     }
 }

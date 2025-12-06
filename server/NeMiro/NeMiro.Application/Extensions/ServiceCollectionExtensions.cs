@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using NeMiro.Application.Auth;
 using NeMiro.Application.Boards;
+using NeMiro.Application.Elements;
 using NeMiro.Application.Pointers;
 using NeMiro.Application.Users;
 using NeMiro.Application.S3;
@@ -16,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IPointerService, PointerService>();
         services.AddSingleton<IS3Service, S3Service>();
         services.AddSingleton<IUserService, UserService>();
+        services.AddSingleton<IElementService, ElementService>();
         return services;
     }
 }

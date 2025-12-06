@@ -7,6 +7,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY ["Directory.Build.props", "."]
 COPY ["NeMiro/NeMiro.csproj", "NeMiro/"]
 COPY ["NeMiro.Application/NeMiro.Application.csproj", "NeMiro.Application/"]
 COPY ["NeMiro.Models/NeMiro.Models.csproj", "NeMiro.Models/"]

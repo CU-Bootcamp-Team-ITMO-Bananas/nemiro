@@ -32,4 +32,16 @@ public class BoardController : ControllerBase
 
         return new OkObjectResult(newBoardId);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetBoards(CancellationToken cancellationToken)
+    {
+        if (!Request.Headers.TryGetValue("User-Id", out var userIdHeader))
+        {
+            return BadRequest("User-Id header missing");
+        }
+
+        var boards = await _boardsService.GetBoards(long.Parse(userIdHeader!), cancellationToken);
+        return new OkObjectResult(boards);
+    }
 }

@@ -104,25 +104,8 @@ export const Canvas = () => {
   }, [selectedElementId, removeElement]);
 
 
-  const hardCodeUsers = [
-    {
-      id: '21607',
-      username: 'Jillian_dangerous',
-      avatar:
-        'https://upload.wikimedia.org/wikipedia/commons/4/43/Bonnet_macaque_%28Macaca_radiata%29_Photograph_By_Shantanu_Kuveskar.jpg',
-      telegram: 0,
-    },
-    {
-      id: '25038',
-      username: 'Agathe_scared',
-      avatar:
-        'https://upload.wikimedia.org/wikipedia/commons/4/43/Bonnet_macaque_%28Macaca_radiata%29_Photograph_By_Shantanu_Kuveskar.jpg',
-      telegram: 0,
-    },
-  ];
-
   const getUserById = (userId: string): User | null => {
-    return hardCodeUsers.find((u) => u.id == userId) ?? null;
+    return board?.users.find((u) => u.id == userId) ?? null;
   };
 
   // Находим выбранный элемент и его renderer

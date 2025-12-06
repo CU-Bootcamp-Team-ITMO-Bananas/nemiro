@@ -2,8 +2,8 @@ import { useAuthStore } from '@/shared/stores/auth.store';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Login } from '@/components/header/login-button';
 import { Logo } from '@/components/header/logo';
-import { LoadingSpinner } from '@/components/header/loading-spinner';
 import { ShareButton } from '@/components/header/share-button';
+import { People } from '@/components/header/people';
 
 interface HeaderProps {
   isShareModalOpen: boolean;
@@ -20,10 +20,11 @@ export const Header = ({ isShareModalOpen, setIsShareModalOpen }: HeaderProps) =
         {/* <LoadingSpinner /> */}
         {isLoggedIn ? (
         <div className='*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale'>
-          <Avatar>
+          <People />
+          {/* <Avatar>
             <AvatarImage src={user?.avatar ?? ''} alt={user?.username ?? ''} />
             <AvatarFallback>{user?.username?.toUpperCase()[0]}</AvatarFallback>
-          </Avatar>
+          </Avatar> */}
           <ShareButton isOpen={isShareModalOpen} setIsOpen={setIsShareModalOpen} />
         </div>
         ): (

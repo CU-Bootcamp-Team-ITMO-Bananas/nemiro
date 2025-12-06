@@ -33,17 +33,17 @@ public class UserRepository(NpgsqlDataSource dataSource) : IUserRepository
     {
         const string sql = """
                            INSERT INTO users (telegram, username, created_at, avatar)
-                           VALUES (@Telegram, @Name, @CreatedAt, @Avatar)
+                           VALUES (@Telegram, @Username, @CreatedAt, @Avatar)
                            """;
 
         await using var connection = await dataSource.OpenConnectionAsync(cancellationToken);
 
         var parameters = new
         {
-            user.Telegram,
-            user.Username,
-            DateTimeOffset.UtcNow,
-            user.Avatar,
+            Telegram = user.Telegram,
+            Username = user.Username,
+            CreatedAt = DateTimeOffset.UtcNow,
+            Avatar = user.Avatar,
         };
 
         await connection.ExecuteAsync(
