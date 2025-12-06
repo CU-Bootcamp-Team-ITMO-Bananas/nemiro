@@ -32,6 +32,11 @@ export const Canvas = () => {
     updateElement(element);
   };
 
+  const onDeleteElement = (element: BoardElement) => {
+    emit<ElementEvent>('DeleteElement', element);
+    removeElement(element.id);
+  };
+
   const lastEmitTime = useRef(0);
   const emitThrottleMs = 100;
 
@@ -203,13 +208,14 @@ export const Canvas = () => {
                     element,
                     isSelected: selectedElementId === element.id,
                     onSelect: () => {
+                      onUpdateElement(element);
                       setSelectedElementId(element.id);
                     },
                     onUpdate: (updatedElement) => {
                       onUpdateElement(updatedElement);
                     },
                     onDelete: (elementId) => {
-                      removeElement(elementId);
+                      onDeleteElement(element);
                     },
                   })}
                 </Fragment>
