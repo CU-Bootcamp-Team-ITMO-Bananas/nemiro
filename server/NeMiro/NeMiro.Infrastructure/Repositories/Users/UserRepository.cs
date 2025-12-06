@@ -12,18 +12,16 @@ public class UserRepository(NpgsqlDataSource dataSource) : IUserRepository
     public async Task Create(User user, CancellationToken cancellationToken)
     {
         const string sql = """
-                           INSERT INTO users (id, telegram, username, created_at, avatar)
-                           VALUES (@Id, @Telegram, @Name, @CreatedAt, @Avatar)
-                           ON CONFLICT (id) DO NOTHING
+                           INSERT INTO users (telegram, username, created_at, avatar)
+                           VALUES (@Telegram, @Name, @CreatedAt, @Avatar)
                            """;
 
         await using var connection = await dataSource.OpenConnectionAsync(cancellationToken);
 
         var parameters = new
         {
-            user.Id,
             user.Telegram,
-            Name = user.Username,
+            user.Username,
             DateTimeOffset.UtcNow,
             user.Avatar,
         };
