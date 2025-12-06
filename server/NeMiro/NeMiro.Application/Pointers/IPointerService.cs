@@ -6,4 +6,5 @@ namespace NeMiro.Application.Pointers;
 public interface IPointerService
 {
     IList<Pointer> GetBoardPointers(string boardId);
+    void AddOrUpdatePointer(string boardId, long userId, PointerDto pointer);
 }
