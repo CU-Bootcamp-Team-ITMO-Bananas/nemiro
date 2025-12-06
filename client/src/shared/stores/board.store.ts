@@ -10,3 +10,4 @@ export const useBoardState = create<BoardState>((set) => ({
   board: null,
   updateBoard: (board) => set({ board }),
 }));
+
