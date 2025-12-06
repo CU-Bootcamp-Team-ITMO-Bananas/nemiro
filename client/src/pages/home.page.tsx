@@ -14,6 +14,7 @@ export const HomePage = () => {
 
   const [boardId, setBoardId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const pathSegments = location.pathname.split('/');
   const urlBoardId = pathSegments[pathSegments.length - 1];
@@ -58,10 +59,15 @@ export const HomePage = () => {
   }
 
   return (
-    <HubContextProvider boardId={boardId || urlBoardId} userId={user.id}>
-      <Header />
-      <Canvas />
-      <Toolbar />
-    </HubContextProvider>
+    user && (
+      <HubContextProvider boardId={urlBoardId} userId={user.id}>
+        <Header
+          isShareModalOpen={isShareModalOpen}
+          setIsShareModalOpen={setIsShareModalOpen}
+        />
+        <Canvas />
+        <Toolbar isShareModalOpen={isShareModalOpen} />
+      </HubContextProvider>
+    )
   );
 };

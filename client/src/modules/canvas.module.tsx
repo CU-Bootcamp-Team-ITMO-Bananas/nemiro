@@ -77,6 +77,34 @@ export const Canvas = () => {
     };
   }, [connection, subscribe, updateBoard]);
 
+  // Обработка удаления выбранного элемента по Backspace
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Проверяем, что фокус не в input/textarea
+      const activeElement = document.activeElement;
+      if (
+        activeElement &&
+        (activeElement.tagName === 'INPUT' ||
+          activeElement.tagName === 'TEXTAREA')
+      ) {
+        return;
+      }
+
+      // Backspace - удаляет выбранный элемент
+      if (e.key === 'Backspace' && selectedElementId) {
+        e.preventDefault();
+        e.stopPropagation();
+        removeElement(selectedElementId);
+        setSelectedElementId(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedElementId, removeElement]);
+
   const getUserById = (userId: string): User | null => {
     return board?.users.find((u) => u.id == userId) ?? null;
   };

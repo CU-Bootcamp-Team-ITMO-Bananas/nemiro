@@ -1,9 +1,7 @@
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NeMiro.Application.Boards;
-using NeMiro.Models.Boards;
 
 namespace NeMiro.Presentation.Controllers;
 
