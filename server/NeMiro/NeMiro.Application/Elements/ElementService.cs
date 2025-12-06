@@ -12,6 +12,7 @@ namespace NeMiro.Application.Elements;
 public class ElementService : IElementService
 {
     private readonly IElementRepository _elementRepository;
+
     private IDictionary<string, IDictionary<string, ElementDto>> _elements;
 
     public ElementService(IElementRepository elementRepository)
@@ -22,10 +23,7 @@ public class ElementService : IElementService
 
     public IList<ElementDto> GetBoardElements(string boardId)
     {
-        if (_elements.TryGetValue(boardId, out var boardElements))
-        {
-            return boardElements.Values.ToList();
-        }
+        return _elements.TryGetValue(boardId, out var boardElements) ? boardElements.Values.ToList() : [];
     }
 
     public async Task AddElementAsync(ElementDto element, string boardId, CancellationToken cancellationToken)
@@ -40,15 +38,22 @@ public class ElementService : IElementService
 
         await _elementRepository.Create(domainElement, cancellationToken);
 
-        _elements.Add(boardId, domainElement);
+        _elements.Add(
+            boardId,
+            new Dictionary<string, ElementDto>(
+            {
+                { element.Id, element }
+            });
     }
 
     public void UpdateElement(ElementDto element, string boardId)
     {
-        if (_elements.TryGetValue(boardId, out var boardElements))
+        if (!_elements.TryGetValue(boardId, out var boardElements))
         {
-            boardElements.Remove(element.Id);
-            boardElements.Add(element.Id, element);
+            return;
         }
+
+        boardElements.Remove(element.Id);
+        boardElements.Add(element.Id, element);
     }
 }
