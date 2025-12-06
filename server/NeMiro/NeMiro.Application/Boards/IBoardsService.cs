@@ -7,7 +7,7 @@ namespace NeMiro.Application.Boards;
 
 public interface IBoardsService
 {
-    Task<BoardDto?> GetBoardByIdAsync(string boardId, CancellationToken cancellationToken);
+    BoardDto GetBoardByIdAsync(string boardId);
     Task<string> CreateBoard(long userId, CancellationToken cancellationToken);
     Task UpdateBoard(UpdateBoardRequest request, CancellationToken cancellationToken);
 }
