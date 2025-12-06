@@ -15,7 +15,7 @@ public class Initial : Migration
                 id                  BIGINT               PRIMARY KEY,
                 telegram            BIGINT               UNIQUE NOT NULL,
                 username            VARCHAR(100)         NOT NULL,
-                created_at          TIMESTAMPTZ          NOT NULL DEFAULT NOW(),
+                created_at          TIMESTAMPTZ          NOT NULL,
                 avatar              VARCHAR(255)
             );
 
@@ -24,8 +24,8 @@ public class Initial : Migration
             (
                 id                  VARCHAR(255)            PRIMARY KEY,
                 owner_id            BIGINT                  REFERENCES users(id) ON DELETE SET NULL,
-                created_at          TIMESTAMPTZ             NOT NULL DEFAULT NOW(),
-                updated_at          TIMESTAMPTZ             NOT NULL DEFAULT NOW()
+                created_at          TIMESTAMPTZ             NOT NULL DEFAULT,
+                updated_at          TIMESTAMPTZ
             );
 
             -- Элементы (elements)
@@ -33,8 +33,8 @@ public class Initial : Migration
             (
                 id                  BIGINT               PRIMARY KEY,
                 board_id            VARCHAR(255)         NOT NULL REFERENCES boards(id) ON DELETE CASCADE,
-                created_at          TIMESTAMPTZ          NOT NULL DEFAULT NOW(),
-                updated_at          TIMESTAMPTZ          NOT NULL DEFAULT NOW(),
+                created_at          TIMESTAMPTZ          NOT NULL,
+                updated_at          TIMESTAMPTZ,
                 content             JSONB
             );
 
