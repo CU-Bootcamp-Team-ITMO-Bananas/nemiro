@@ -9,4 +9,5 @@ public interface IUserService
 {
     IList<User> GetBoardUsers(string boardId);
     Task JoinBoardUser(string boardId, long userId, CancellationToken cancellationToken);
+    void DisconnectUserFromBoard(string boardId, long userId);
 }
