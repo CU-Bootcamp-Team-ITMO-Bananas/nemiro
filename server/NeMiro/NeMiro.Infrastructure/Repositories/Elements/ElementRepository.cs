@@ -87,7 +87,7 @@ public class ElementRepository : IElementRepository
             var paramContent = $"content{i}";
             var paramUpdatedAt = $"updated_at{i}";
 
-            valueClauses.Add($"(@{paramId}, @{paramContent}::jsonb)");
+            valueClauses.Add($"(@{paramId}, @{paramContent}, @{paramUpdatedAt})");
 
             parameters.Add(paramId, element.Id);
             parameters.Add(paramContent, JsonSerializer.Serialize(element.Content));

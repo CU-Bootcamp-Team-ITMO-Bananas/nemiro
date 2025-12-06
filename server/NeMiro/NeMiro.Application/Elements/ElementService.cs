@@ -32,7 +32,7 @@ public class ElementService : IElementService
         {
             Id = element.Id,
             BoardId = boardId,
-            CreatedAt = DateTimeOffset.Now,
+            CreatedAt = DateTimeOffset.UtcNow,
             Content = element.Content,
         };
 
@@ -54,6 +54,7 @@ public class ElementService : IElementService
             {
                 boardElements.Remove(element.Id);
             }
+
             boardElements.Add(element.Id, element);
             var newElement = new Element()
             {
@@ -64,6 +65,10 @@ public class ElementService : IElementService
                 UpdatedAt = DateTimeOffset.UtcNow
             };
             await _elementRepository.UpdateBatch([newElement], cancellationToken);
+        }
+        else
+        {
+            await AddElementAsync(element, boardId, cancellationToken);
         }
     }
 
