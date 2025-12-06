@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NeMiro.Infrastructure.Repositories.Users;
@@ -8,29 +9,44 @@ namespace NeMiro.Application.Users;
 
 public class UserService : IUserService
 {
-    private readonly IDictionary<string, IList<User>> _boardUsers;
+    private readonly IDictionary<string, IDictionary<long, User>> _users;
+
     private readonly IUserRepository _userRepository;
 
     public UserService(IUserRepository userRepository)
     {
         _userRepository = userRepository;
-        _boardUsers = new Dictionary<string, IList<User>>();
+        _users = new Dictionary<string, IDictionary<long, User>>();
     }
+
     public IList<User> GetBoardUsers(string boardId)
     {
-        return _boardUsers.TryGetValue(boardId, out var user) ? user : new List<User>();
+        return _users.TryGetValue(boardId, out var users) ? users.Values.ToList() : [];
     }
 
     public async Task JoinBoardUser(string boardId, long userId, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetUserAsync(userId, cancellationToken);
-        if (_boardUsers.TryGetValue(boardId, out var value))
+        if (_users.TryGetValue(boardId, out var boardUsers))
         {
-            value.Add(user);
+            boardUsers.Add(userId, user);
         }
         else
         {
-            _boardUsers.Add(boardId, new List<User> { user, });
+            _users.Add(
+                boardId,
+                new Dictionary<long, User>
+                {
+                    { userId, user },
+                });
+        }
+    }
+
+    public void DisconnectUserFromBoard(string boardId, long userId)
+    {
+        if (_users.TryGetValue(boardId, out var boardUsers))
+        {
+            boardUsers.Remove(userId);
         }
     }
 }

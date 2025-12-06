@@ -43,4 +43,12 @@ public class PointerService : IPointerService
                 });
         }
     }
+
+    public void RemovePointer(string boardId, long userId)
+    {
+        if (_pointers.TryGetValue(boardId, out var boardPointers))
+        {
+            boardPointers.Remove(userId);
+        }
+    }
 }
