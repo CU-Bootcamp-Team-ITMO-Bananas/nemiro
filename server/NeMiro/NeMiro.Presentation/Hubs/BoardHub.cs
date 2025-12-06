@@ -99,6 +99,6 @@ public class BoardHub : Hub
         var cancellationToken = httpContext.RequestAborted;
         var boardId = Context.Items["board_id"] as string;
 
-        _elementService.UpdateElement(element, boardId);
+        await _elementService.UpdateElement(element, boardId, cancellationToken);
     }
 }

@@ -46,14 +46,21 @@ public class ElementService : IElementService
             });
     }
 
-    public void UpdateElement(ElementDto element, string boardId)
+    public async Task UpdateElement(ElementDto element, string boardId, CancellationToken cancellationToken)
     {
-        if (!_elements.TryGetValue(boardId, out var boardElements))
+        if (_elements.TryGetValue(boardId, out var boardElements))
         {
-            return;
+            boardElements.Remove(element.Id);
+            boardElements.Add(element.Id, element);
+            var newElement = new Element()
+            {
+                Id = element.Id,
+                BoardId = boardId,
+                CreatedAt = DateTimeOffset.UtcNow,
+                Content = element.Content,
+                UpdatedAt = DateTimeOffset.UtcNow
+            };
+            await _elementRepository.UpdateBatch([newElement], cancellationToken);
         }
-
-        boardElements.Remove(element.Id);
-        boardElements.Add(element.Id, element);
     }
 }
