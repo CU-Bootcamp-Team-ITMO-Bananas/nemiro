@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NeMiro.Application.DTOs;
+using NeMiro.Application.Elements;
 using NeMiro.Application.Pointers;
 using NeMiro.Application.Users;
 using NeMiro.Infrastructure.Repositories.Boards;
@@ -21,11 +22,14 @@ public class BoardsService : IBoardsService
 
     private readonly IUserService _userService;
 
-    public BoardsService(IBoardRepository boardRepository, IPointerService pointerService, IUserService userService)
+    private readonly IElementService _elementService;
+
+    public BoardsService(IBoardRepository boardRepository, IPointerService pointerService, IUserService userService, IElementService elementService)
     {
         _boardRepository = boardRepository;
         _pointerService = pointerService;
         _userService = userService;
+        _elementService = elementService;
         _boardDictionary = new Dictionary<string, BoardDto>();
     }
 
@@ -38,7 +42,14 @@ public class BoardsService : IBoardsService
     {
         var pointers = _pointerService.GetBoardPointers(boardId);
         var users = _userService.GetBoardUsers(boardId);
-        var board = new BoardDto(boardId, users, pointers);
+        var elements = _elementService.GetBoardElements(boardId);
+        var board = new BoardDto()
+        {
+            Id = boardId,
+            Users = users,
+            Elements = elements,
+            Pointers = pointers
+        };
         return board;
     }
 
