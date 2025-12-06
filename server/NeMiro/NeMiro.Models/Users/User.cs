@@ -1,3 +1,3 @@
 namespace NeMiro.Models.Users;
 
-public record User(long Id, string Name, string? Avatar, long Telegram);
+public record User(long Id, string Username, string? Avatar, long Telegram);

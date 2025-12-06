@@ -23,7 +23,7 @@ public class UserRepository(NpgsqlDataSource dataSource) : IUserRepository
         {
             user.Id,
             user.Telegram,
-            user.Name,
+            Name = user.Username,
             DateTimeOffset.UtcNow,
             user.Avatar,
         };

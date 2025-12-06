@@ -24,7 +24,7 @@ public class Initial : Migration
             (
                 id                  VARCHAR(255)            PRIMARY KEY,
                 owner_id            BIGINT                  REFERENCES users(id) ON DELETE SET NULL,
-                created_at          TIMESTAMPTZ             NOT NULL DEFAULT,
+                created_at          TIMESTAMPTZ             NOT NULL DEFAULT NOW(),
                 updated_at          TIMESTAMPTZ
             );
 

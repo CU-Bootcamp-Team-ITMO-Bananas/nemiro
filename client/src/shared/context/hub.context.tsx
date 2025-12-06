@@ -11,34 +11,37 @@ import {
 interface IHubContext {
   connection: HubConnection | null;
   connectionStarted: boolean;
-  subscribe: (
+  subscribe: <T>(
     event: string,
-    callback: (...args: unknown[]) => void,
+    callback: (data: T) => void,
     signal?: AbortSignal
   ) => () => void;
-  emit: (event: string, ...args: unknown[]) => void;
+  emit: <T>(event: string, data: T) => void;
 }
 
 const HubContext = createContext<IHubContext>({
   connection: null,
   connectionStarted: false,
   subscribe:
-    (event: string, callback: (...args: unknown[]) => void) => () => {},
-  emit: (event: string, ...args: unknown[]) => {},
+    <T,>(event: string, callback: (data: T) => void) =>
+    () => {},
+  emit: <T,>(event: string, data: T) => {},
 });
 
 export const HubContextProvider = ({
   children,
   boardId,
+  userId,
 }: {
   children: ReactNode;
   boardId: string;
+  userId: string;
 }) => {
   const [connection, setConnection] = useState<HubConnection | null>(null);
   const [connectionStarted, setConnectionStarted] = useState(false);
 
   const startNewConnection = () => {
-    const newConnection = buildConnection(boardId);
+    const newConnection = buildConnection(boardId, userId);
     setConnection(newConnection);
   };
 
@@ -58,9 +61,9 @@ export const HubContextProvider = ({
     }
   }, [connection]);
 
-  const subscribe = (
+  const subscribe = <T,>(
     event: string,
-    callback: (...args: unknown[]) => void,
+    callback: (data: T) => void,
     signal?: AbortSignal
   ) => {
     if (signal?.aborted) {
@@ -69,7 +72,7 @@ export const HubContextProvider = ({
 
     const loggingCallback = (data: unknown) => {
       console.info(`[socket] < ${event}`, data);
-      callback(data);
+      callback(data as T);
     };
 
     connection?.on(event, loggingCallback);

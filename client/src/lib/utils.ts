@@ -8,9 +8,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function buildConnection(boardId: string): HubConnection {
+export function buildConnection(
+  boardId: string,
+  userId: string
+): HubConnection {
   const connection = new HubConnectionBuilder()
-    .withUrl(`${API_URL}/board/${boardId}`)
+    .withUrl(`${API_URL}/board?board_id=${boardId}&user_id=${userId}`, {
+      withCredentials: false,
+    })
     .withAutomaticReconnect()
     .configureLogging(LogLevel.Information)
     .build();

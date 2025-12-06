@@ -1,0 +1,58 @@
+name: Build & Push v2
+
+on:
+ push:
+  tags: ['v*']
+ workflow_dispatch:
+
+jobs:
+ push:
+  if: github.event_name != 'pull_request'
+  strategy:
+   matrix:
+    service: [client, server]
+
+  runs-on: ubuntu-latest
+
+  steps:
+   - name: Checkout
+     uses: actions/checkout@v4
+     with:
+      fetch-depth: 0
+
+   - name: Set up Docker Buildx
+     uses: docker/setup-buildx-action@v3
+
+   - name: Login to registry
+     uses: docker/login-action@v3
+     with:
+      registry: cr.dev.polechat.ru
+      username: ${{ secrets.REGISTRY_USER }}
+      password: ${{ secrets.REGISTRY_PASSWORD }}
+
+   - name: Transform service name
+     id: transform
+     run: |
+      SERVICE_NAME="${{ matrix.service }}"
+      TRANSFORMED=$(echo "$SERVICE_NAME" | sed 's/-service$/Service/' | sed 's/-\([a-z]\)/\U\1/g' | sed 's/^\([a-z]\)/\U\1/')
+      echo "dockerfile_path=./src/Polechat.${TRANSFORMED}/Dockerfile" >> $GITHUB_OUTPUT
+
+   - name: Extract tags
+     id: tags
+     run: |
+      if [[ $GITHUB_REF == refs/tags/* ]]; then
+        TAG=${GITHUB_REF#refs/tags/}
+        echo "tags=cr.dev.polechat.ru/${{ matrix.service }}:${TAG}" >> $GITHUB_OUTPUT
+      else
+        echo "tags=cr.dev.polechat.ru/${{ matrix.service }}:latest" >> $GITHUB_OUTPUT
+      fi
+
+   - name: Build and push Docker image
+     uses: docker/build-push-action@v5
+     with:
+      context: .
+      file: ${{ steps.transform.outputs.dockerfile_path }}
+      tags: ${{ steps.tags.outputs.tags }}
+      push: true
+      cache-from: type=gha,scope=${{ matrix.service }}
+      cache-to: type=gha,mode=max,scope=${{ matrix.service }}

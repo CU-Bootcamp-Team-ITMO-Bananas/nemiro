@@ -1,5 +1,5 @@
-import logo from '../assets/logo.svg';
-import { Badge } from './ui/badge';
+import logo from '../../assets/logo.svg';
+import { Badge } from '../ui/badge';
 
 export const Logo = () => {
   return (

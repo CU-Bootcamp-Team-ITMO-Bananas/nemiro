@@ -23,6 +23,10 @@ builder.Services
     .AddServices()
     .AddControllers();
 
+builder.Services
+    .AddSwaggerGen()
+    .AddSignalR();
+
 WebApplication app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -43,8 +47,9 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseCors(b => b.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
 app.MapControllers();
-app.MapHub<BoardHub>("/hubs/board");
+app.MapHub<BoardHub>("/api/v1/board");
 
 await app.RunAsync();
