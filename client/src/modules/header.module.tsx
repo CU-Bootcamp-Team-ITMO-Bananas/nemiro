@@ -21,7 +21,7 @@ export const Header = ({
     <div className='absolute top-4 left-4 right-4 flex justify-between z-30'>
       <Logo />
       <div className='flex items-center gap-5'>
-        {/* <LoadingSpinner /> */}
+        <LoadingSpinner />
         {isLoggedIn ? (
           <div className='*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale'>
             <People />
