@@ -11,6 +11,7 @@ import {
 interface IHubContext {
   connection: HubConnection | null;
   connectionStarted: boolean;
+  boardId: string;
   subscribe: <T>(
     event: string,
     callback: (data: T) => void,
@@ -22,6 +23,7 @@ interface IHubContext {
 const HubContext = createContext<IHubContext>({
   connection: null,
   connectionStarted: false,
+  boardId: '',
   subscribe:
     <T,>(event: string, callback: (data: T) => void) =>
     () => {},
@@ -94,7 +96,7 @@ export const HubContextProvider = ({
 
   return (
     <HubContext.Provider
-      value={{ emit, subscribe, connection, connectionStarted }}
+      value={{ emit, subscribe, connection, connectionStarted, boardId }}
     >
       {children}
     </HubContext.Provider>
@@ -102,7 +104,7 @@ export const HubContextProvider = ({
 };
 
 export const useHub = () => {
-  const { emit, subscribe, connection, connectionStarted } =
+  const { emit, subscribe, connection, connectionStarted, boardId } =
     useContext(HubContext);
-  return { emit, subscribe, connection, connectionStarted };
+  return { emit, subscribe, connection, connectionStarted, boardId };
 };

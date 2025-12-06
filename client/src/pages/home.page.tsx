@@ -1,6 +1,6 @@
 import { Canvas } from '@/modules/canvas.module';
 import { Header } from '@/modules/header.module';
-import { Toolbar } from '@/components/toolbar';
+import { Toolbar } from '@/modules/toolbar.module';
 import { HubContextProvider } from '@/shared/context/hub.context';
 import { useAuthStore } from '@/shared/stores/auth.store';
 import { useLocation } from 'react-router-dom';
