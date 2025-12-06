@@ -5,9 +5,16 @@ namespace NeMiro.Application.DTOs;
 
 public class BoardDto
 {
-    public required string Id { get; init; }
+    public BoardDto(string id, IList<User> users, IList<Pointer> pointers)
+    {
+        Id = id;
+        Users = users;
+        Pointers = pointers;
+    }
 
-    public required IList<User> Users { get; init; }
+    public string Id { get; init; }
 
-    public required IList<Pointer> Pointers { get; init; }
+    public IList<User> Users { get; init; }
+
+    public IList<Pointer> Pointers { get; init; }
 }
