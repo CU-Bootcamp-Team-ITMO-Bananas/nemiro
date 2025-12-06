@@ -61,33 +61,14 @@ public class BoardHub : Hub
 
     public async Task UpdatePointer(PointerDto pointer)
     {
-        var httpContext = Context.GetHttpContext();
         var userId = (long)Context.Items["user_id"]!;
         var boardId = Context.Items["board_id"] as string;
-        var cancellationToken = httpContext.RequestAborted;
 
-        var board = await _boardService.GetBoardByIdAsync(boardId, cancellationToken);
+        var board = _boardService.GetBoardByIdAsync(boardId);
 
         await Clients.OthersInGroup($"board-{boardId}")
             .SendAsync(
                 "BoardUpdate",
                 board);
-    }
-
-    public async Task UpdateElement(ElementDto element)
-    {
-        var boardId = Context.Items["board_id"] as string;
-
-        await _boardService.UpdateBoard()
-
-        await Clients.OthersInGroup($"board-{boardId}")
-            .SendAsync(
-                "BoardUpdate",
-                new BoardDto
-                {
-                    Id = boardId,
-                    Users = [],
-                    Pointers = [pointerDto]
-                });
     }
 }

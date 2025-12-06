@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NeMiro.Application.DTOs;
 using NeMiro.Application.Pointers;
+using NeMiro.Application.Users;
 using NeMiro.Infrastructure.Repositories.Boards;
 using NeMiro.Models.Boards;
 using NeMiro.Models.Users;
@@ -15,18 +16,21 @@ public class BoardsService : IBoardsService
     private readonly Dictionary<string, BoardDto> _boardDictionary;
     private readonly IBoardRepository _boardRepository;
     private readonly IPointerService _pointerService;
+    private  readonly IUserService _userService;
 
-    public BoardsService(IBoardRepository boardRepository, IPointerService pointerService)
+    public BoardsService(IBoardRepository boardRepository, IPointerService pointerService, IUserService userService)
     {
         _boardRepository = boardRepository;
         _pointerService = pointerService;
+        _userService = userService;
         _boardDictionary = new Dictionary<string, BoardDto>();
     }
 
-    public async Task<BoardDto?> GetBoardByIdAsync(string boardId, CancellationToken cancellationToken)
+    public BoardDto GetBoardByIdAsync(string boardId)
     {
         var pointers = _pointerService.GetBoardPointers(boardId);
-        var board = new BoardDto(boardId, new List<User>(), pointers);
+        var users = _userService.GetBoardUsers(boardId);
+        var board = new BoardDto(boardId, users, pointers);
         return board;
     }
 
