@@ -105,7 +105,7 @@ export const Canvas = () => {
     };
   }, [selectedElementId, removeElement]);
 
-  const getUserById = (userId: string): User | null => {
+  const getUserById = (userId: number): User | null => {
     console.log(board);
     return board?.users.find((u) => u.id == userId) ?? null;
   };

@@ -37,7 +37,7 @@ export const HubContextProvider = ({
 }: {
   children: ReactNode;
   boardId: string;
-  userId: string;
+  userId: number;
 }) => {
   const [connection, setConnection] = useState<HubConnection | null>(null);
   const [connectionStarted, setConnectionStarted] = useState(false);

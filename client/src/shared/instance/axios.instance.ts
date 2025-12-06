@@ -9,7 +9,7 @@ const instance = axios.create({
 instance.interceptors.request.use((config) => {
   const { user } = getAuthStoreMethods();
   if (user) {
-    config.headers['User-Id'] = user.telegram;
+    config.headers['User-Id'] = user.id;
   }
   return config;
 });

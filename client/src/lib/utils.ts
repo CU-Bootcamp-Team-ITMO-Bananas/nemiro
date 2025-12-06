@@ -10,7 +10,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function buildConnection(
   boardId: string,
-  userId: string
+  userId: number
 ): HubConnection {
   const connection = new HubConnectionBuilder()
     .withUrl(`${API_URL}/board?board_id=${boardId}&user_id=${userId}`, {

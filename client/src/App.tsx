@@ -13,7 +13,7 @@ function App() {
       if (user == null) {
         const anonymous = anonymousUser();
         const newUser = await loginUser({
-          id: Number.parseInt(anonymous.id),
+          id: anonymous.id,
           first_name: anonymous.username!,
           last_name: anonymous.username!,
           username: anonymous.username!,
