@@ -2,6 +2,8 @@ using System;
 using FluentMigrator.Runner;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NeMiro.Infrastructure.Repositories.Elements;
+using NeMiro.Infrastructure.Repositories.Users;
 using Npgsql;
 
 namespace NeMiro.Infrastructure.Extensions;
@@ -32,6 +34,9 @@ public static class ServiceCollectionExtensions
                                  .ScanIn(typeof(ServiceCollectionExtensions).Assembly)
                                  .For.Migrations())
             .AddLogging(lb => lb.AddFluentMigratorConsole());
+
+        serviceCollection.AddSingleton<IElementRepository, ElementRepository>();
+        serviceCollection.AddSingleton<IUserRepository, UserRepository>();
 
         return serviceCollection;
     }
