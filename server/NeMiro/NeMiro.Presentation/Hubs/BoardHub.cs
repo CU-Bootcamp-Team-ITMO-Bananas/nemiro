@@ -88,6 +88,6 @@ public class BoardHub : Hub
         var cancellationToken = httpContext.RequestAborted;
         var boardId = Context.Items["board_id"] as string;
 
-        await _elementService.AddElementAsync(element, boardId, cancellationToken);
+        _elementService.UpdateElement(element, boardId);
     }
 }
