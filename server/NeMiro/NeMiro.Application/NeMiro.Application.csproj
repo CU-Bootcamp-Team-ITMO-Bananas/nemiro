@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
+    <ProjectReference Include="..\NeMiro.Infrastructure\NeMiro.Infrastructure.csproj" />
     <ProjectReference Include="..\NeMiro.Models\NeMiro.Models.csproj" />
   </ItemGroup>
   <ItemGroup>

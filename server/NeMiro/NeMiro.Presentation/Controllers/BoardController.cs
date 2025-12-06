@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NeMiro.Application.Boards;
@@ -15,7 +16,7 @@ public class BoardController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateBoard()
+    public async Task<IActionResult> CreateBoard(CancellationToken cancellationToken)
     {
         if (!Request.Headers.TryGetValue("User-Id", out var userIdHeader))
         {
@@ -27,7 +28,7 @@ public class BoardController : ControllerBase
             return BadRequest("User-Id is not a valid long number");
         }
 
-        var newBoardId = await _boardsService.CreateBoard(userId);
+        var newBoardId = await _boardsService.CreateBoard(userId, cancellationToken);
 
         return new OkObjectResult(newBoardId);
     }
