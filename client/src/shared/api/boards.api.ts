@@ -2,7 +2,6 @@ import { axiosInstance } from '../instance/axios.instance';
 
 export const createBoard = async (): Promise<string | null> => {
   try {
-    console.log("HEY");
     const res = await axiosInstance.post<string>('boards');
     return res.data;
   } catch (err) {
