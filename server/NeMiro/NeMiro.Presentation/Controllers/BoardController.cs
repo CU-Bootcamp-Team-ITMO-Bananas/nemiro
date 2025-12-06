@@ -35,9 +35,15 @@ public class BoardController : ControllerBase
         return new OkObjectResult(newBoardId);
     }
 
-    [HttpGet("{userId:long}")]
-    public async Task<IEnumerable<Board>> GetBoards([FromRoute] long userId, CancellationToken cancellationToken)
+    [HttpGet]
+    public async Task<IActionResult> GetBoards(CancellationToken cancellationToken)
     {
-        return await _boardsService.GetBoards(userId, cancellationToken);
+        if (!Request.Headers.TryGetValue("User-Id", out var userIdHeader))
+        {
+            return BadRequest("User-Id header missing");
+        }
+
+        var boards = await _boardsService.GetBoards(long.Parse(userIdHeader!), cancellationToken);
+        return new OkObjectResult(boards);
     }
 }
