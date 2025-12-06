@@ -21,7 +21,7 @@ export const Header = ({
   return (
     <div className='absolute top-4 left-4 right-4 flex justify-between z-30'>
       <Logo />
-      <AvailableBoardsButton />
+      {/* <AvailableBoardsButton /> */}
       <div className='flex items-center gap-5'>
         <div className='*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale'>
           <People />
