@@ -63,10 +63,10 @@ public class BoardRepository(NpgsqlDataSource dataSource) : IBoardRepository
     {
         const string sql = """
                            SELECT
-                               id AS Id,
-                               owner_id AS OwnerId,
-                               created_at AS CreatedAt,
-                               updated_at AS UpdatedAt
+                               id as Id,
+                               owner_id as OwnerId,
+                               created_at as CreatedAt,
+                               updated_at as UpdatedAt
                            FROM boards
                            WHERE owner_id = @UserId
                            ORDER BY created_at DESC

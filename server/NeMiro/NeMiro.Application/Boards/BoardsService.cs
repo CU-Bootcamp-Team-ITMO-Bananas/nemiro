@@ -14,9 +14,12 @@ namespace NeMiro.Application.Boards;
 public class BoardsService : IBoardsService
 {
     private readonly Dictionary<string, BoardDto> _boardDictionary;
+
     private readonly IBoardRepository _boardRepository;
+
     private readonly IPointerService _pointerService;
-    private  readonly IUserService _userService;
+
+    private readonly IUserService _userService;
 
     public BoardsService(IBoardRepository boardRepository, IPointerService pointerService, IUserService userService)
     {
@@ -41,7 +44,13 @@ public class BoardsService : IBoardsService
 
     public async Task<string> CreateBoard(long userId, CancellationToken cancellationToken)
     {
-        var newBoard = new Board(Guid.NewGuid().ToString(), userId, DateTimeOffset.UtcNow, null);
+        var newBoard = new Board
+        {
+            Id = Guid.NewGuid().ToString(),
+            OwnerId = userId,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = null,
+        };
         await _boardRepository.Create(newBoard, cancellationToken);
         return newBoard.Id;
     }
@@ -56,10 +65,21 @@ public class BoardsService : IBoardsService
         var storedBoard = await _boardRepository.GetById(boardId, cancellationToken);
         if (storedBoard != null) return storedBoard;
 
-        var board = new Board(boardId, ownerId, DateTimeOffset.UtcNow, null);
-
+        var board = new Board
+        {
+            Id = Guid.NewGuid().ToString(),
+            OwnerId = ownerId,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = null,
+        };
         await _boardRepository.Create(
-            new Board(boardId, ownerId, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow),
+            new Board
+            {
+                Id = Guid.NewGuid().ToString(),
+                OwnerId = ownerId,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = null,
+            },
             cancellationToken);
 
         return board;
