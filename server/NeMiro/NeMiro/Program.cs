@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NeMiro.Application.Extensions;
+using NeMiro.Application.Options;
 using NeMiro.Infrastructure.Extensions;
 using NeMiro.Presentation.Hubs;
 
@@ -16,6 +17,8 @@ if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
 }
 
 var configuration = builder.Configuration;
+
+builder.Services.Configure<S3Settings>(builder.Configuration.GetSection("S3Settings"));
 
 builder.Services.AddInfrastructure(configuration);
 
