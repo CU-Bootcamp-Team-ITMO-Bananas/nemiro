@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NeMiro.Application.Boards;
+using NeMiro.Models.Boards;
 
 namespace NeMiro.Presentation.Controllers;
 
@@ -31,5 +33,11 @@ public class BoardController : ControllerBase
         var newBoardId = await _boardsService.CreateBoard(userId, cancellationToken);
 
         return new OkObjectResult(newBoardId);
+    }
+
+    [HttpGet("{userId:long}")]
+    public async Task<IEnumerable<Board>> GetBoards([FromRoute] long userId, CancellationToken cancellationToken)
+    {
+        return await _boardsService.GetBoards(userId, cancellationToken);
     }
 }

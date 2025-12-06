@@ -26,6 +26,11 @@ public class BoardsService : IBoardsService
         _boardDictionary = new Dictionary<string, BoardDto>();
     }
 
+    public async Task<IEnumerable<Board>> GetBoards(long userId, CancellationToken cancellationToken)
+    {
+        return await _boardRepository.GetBoardsByUserId(userId, cancellationToken);
+    }
+
     public BoardDto GetBoardByIdAsync(string boardId)
     {
         var pointers = _pointerService.GetBoardPointers(boardId);
