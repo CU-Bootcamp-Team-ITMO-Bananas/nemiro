@@ -7,7 +7,7 @@ namespace NeMiro.Application.S3;
 
 public interface IS3Service
 {
-    Task<S3FileResponse> UploadFileAsync(
+    Task<S3FileResponse> UploadFile(
         Stream fileStream,
         string fileName,
         string contentType,

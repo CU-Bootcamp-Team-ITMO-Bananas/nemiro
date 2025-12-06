@@ -8,7 +8,7 @@ using NeMiro.Application.S3;
 
 namespace NeMiro.Presentation.Controllers;
 
-[Route("api/v1/boards")]
+[Route("api/v1/files")]
 public class FilesController(
     IS3Service s3Service,
     ILogger<FilesController> logger) : ControllerBase
@@ -24,7 +24,7 @@ public class FilesController(
         try
         {
             await using var stream = file.OpenReadStream();
-            var result = await s3Service.UploadFileAsync(
+            var result = await s3Service.UploadFile(
                 stream,
                 file.FileName,
                 file.ContentType,
