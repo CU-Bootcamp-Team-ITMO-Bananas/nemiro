@@ -1,0 +1,8 @@
+{
+	"dependencies": {
+		"@microsoft/signalr": "^10.0.0",
+		"HubConnection": "link:@microsoft/signalr/dist/esm/HubConnection",
+		"konva": "^10.0.12",
+		"react-konva": "^19.2.1"
+	}
+}
