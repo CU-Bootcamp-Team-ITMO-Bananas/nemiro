@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { StickerElement } from '@/shared/interfaces/board/tools/sticker-element.interface';
 import { cn } from '@/lib/utils';
-
+import { STICKER_COLORS } from './sticker-config-menu';
 
 interface StickerProps {
   element: StickerElement;
@@ -10,18 +10,6 @@ interface StickerProps {
   isSelected?: boolean;
   onSelect?: () => void;
 }
-
-// Цвета стикеров (как в Miro)
-const STICKER_COLORS = [
-  '#FFD93D', // Желтый
-  '#6BCF7F', // Зеленый
-  '#4D96FF', // Синий
-  '#9B51E0', // Фиолетовый
-  '#F2994A', // Оранжевый
-  '#EB5757', // Красный
-  '#2F80ED', // Темно-синий
-  '#56CCF2', // Голубой
-];
 
 export const Sticker = ({
   element,
@@ -68,26 +56,28 @@ export const Sticker = ({
     }
   }, [isEditing]);
 
-  // Обработка удаления стикера по нажатию Delete/Backspace
+  // Обработка удаления стикера по нажатию Command/Ctrl + Backspace
   useEffect(() => {
-    if (!isSelected || isEditing || !onDelete) return;
+    if (isEditing || !onDelete) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Удаляем только если не редактируем текст и стикер выбран
-      if ((e.key === 'Delete' || e.key === 'Backspace') && !isEditing) {
-        // Проверяем, что фокус не в input/textarea
-        const activeElement = document.activeElement;
-        if (
-          activeElement &&
-          (activeElement.tagName === 'INPUT' ||
-            activeElement.tagName === 'TEXTAREA')
-        ) {
-          return;
-        }
+      // Проверяем, что фокус не в input/textarea
+      const activeElement = document.activeElement;
+      if (
+        activeElement &&
+        (activeElement.tagName === 'INPUT' ||
+          activeElement.tagName === 'TEXTAREA')
+      ) {
+        return;
+      }
 
+      // Command/Ctrl + Backspace - удаляет независимо от выбора
+      const isModifierPressed = e.metaKey || e.ctrlKey;
+      if (isModifierPressed && e.key === 'Backspace') {
         e.preventDefault();
         e.stopPropagation();
         onDelete(element.id);
+        return;
       }
     };
 
@@ -134,6 +124,7 @@ export const Sticker = ({
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+
     if (onSelect && !isDragging) {
       onSelect();
     }
@@ -247,68 +238,68 @@ export const Sticker = ({
 
   return (
     <div
-      ref={stickerRef}
-      className={cn(
-        'absolute select-none',
-        isDragging ? 'cursor-grabbing' : 'cursor-move'
-      )}
-      style={{
-        left: `${element.x}px`,
-        top: `${element.y}px`,
-        transform: `rotate(${element.rotation}deg) scale(${element.scale})`,
-        zIndex: element.zIndex,
-        width: `${width}px`,
-        height: `${height}px`,
-        userSelect: 'none',
-      }}
-      onMouseDown={handleMouseDown}
-      onClick={handleClick}
-      onDoubleClick={handleDoubleClick}
-    >
-      <div
+        ref={stickerRef}
         className={cn(
-          'relative w-full h-full p-3 rounded-lg shadow-md transition-shadow hover:shadow-lg',
-          isSelected && 'ring-2 ring-blue-500'
+          'absolute select-none',
+          isDragging ? 'cursor-grabbing' : 'cursor-move'
         )}
         style={{
-          backgroundColor,
+          left: `${element.x}px`,
+          top: `${element.y}px`,
+          transform: `rotate(${element.rotation}deg) scale(${element.scale})`,
+          zIndex: element.zIndex,
+          width: `${width}px`,
+          height: `${height}px`,
+          userSelect: 'none',
         }}
+        onMouseDown={handleMouseDown}
+        onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
       >
-        {isEditing ? (
-          <textarea
-            ref={textareaRef}
-            value={text}
-            onChange={(e) => handleTextChange(e.target.value)}
-            onBlur={handleBlur}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleBlur();
-              }
-              if (e.key === 'Escape') {
-                handleBlur();
-              }
-            }}
-            className='w-full h-full bg-transparent border-none outline-none resize-none text-gray-900 font-medium text-sm leading-tight'
-            style={{
-              minHeight: '60px',
-            }}
-            placeholder='Введите текст...'
-          />
-        ) : (
-          <div
-            className='w-full h-full text-gray-900 font-medium text-sm leading-tight whitespace-pre-wrap break-words'
-            style={{
-              minHeight: '60px',
-            }}
-          >
-            {text || (
-              <span className='text-gray-500 italic'>Дважды кликните для редактирования</span>
-            )}
-          </div>
-        )}
+        <div
+          className={cn(
+            'relative w-full h-full p-3 rounded-lg shadow-md transition-shadow hover:shadow-lg',
+            isSelected && 'ring-2 ring-blue-500'
+          )}
+          style={{
+            backgroundColor,
+          }}
+        >
+          {isEditing ? (
+            <textarea
+              ref={textareaRef}
+              value={text}
+              onChange={(e) => handleTextChange(e.target.value)}
+              onBlur={handleBlur}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleBlur();
+                }
+                if (e.key === 'Escape') {
+                  handleBlur();
+                }
+              }}
+              className='w-full h-full bg-transparent border-none outline-none resize-none text-gray-900 font-medium text-sm leading-tight'
+              style={{
+                minHeight: '60px',
+              }}
+              placeholder='Введите текст...'
+            />
+          ) : (
+            <div
+              className='w-full h-full text-gray-900 font-medium text-sm leading-tight whitespace-pre-wrap break-words'
+              style={{
+                minHeight: '60px',
+              }}
+            >
+              {text || (
+                <span className='text-gray-500 italic'>Дважды кликните для редактирования</span>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
   );
 };
 

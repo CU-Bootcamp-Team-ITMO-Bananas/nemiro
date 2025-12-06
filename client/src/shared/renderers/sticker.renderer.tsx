@@ -1,7 +1,8 @@
-import { ElementRenderer, ElementRendererProps } from './element-renderer.interface';
+import { ElementRenderer, ElementRendererProps, ElementRendererConfigPanelProps } from './element-renderer.interface';
 import { StickerElement } from '../interfaces/board/tools/sticker-element.interface';
 import { BoardElement } from '../interfaces/board/board-element.interface';
 import { Sticker } from '@/components/tools/sticker';
+import { StickerConfigMenu } from '@/components/tools/sticker-config-menu';
 
 export const stickerRenderer: ElementRenderer = {
   canRender: (element: BoardElement): element is StickerElement => {
@@ -24,6 +25,20 @@ export const stickerRenderer: ElementRenderer = {
         onUpdate={onUpdate}
         onDelete={onDelete}
         onSelect={onSelect}
+      />
+    );
+  },
+
+  renderConfigPanel: ({ element, board, onUpdate }: ElementRendererConfigPanelProps) => {
+    if (!stickerRenderer.canRender(element)) {
+      return null;
+    }
+
+    return (
+      <StickerConfigMenu
+        element={element as StickerElement}
+        board={board}
+        onUpdate={onUpdate}
       />
     );
   },

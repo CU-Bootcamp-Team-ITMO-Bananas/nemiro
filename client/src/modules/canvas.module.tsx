@@ -6,11 +6,12 @@ import { PointerUpdateEvent } from '@/shared/interfaces/events/pointer-update-ev
 import { User } from '@/shared/interfaces/user.interface';
 import { useBoardStore } from '@/shared/stores/board.store';
 import { findRenderer } from '@/shared/renderers/element-renderer.registry';
-import { useCallback, useEffect, useRef, Fragment } from 'react';
-import { Stage, Layer, Circle, Group } from 'react-konva';
+import { useCallback, useEffect, useRef, Fragment, useState } from 'react';
+import { Stage, Layer } from 'react-konva';
 
 export const Canvas = () => {
   const { board, updateBoard, updateElement, removeElement } = useBoardStore();
+  const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const { subscribe, emit, connection } = useHub();
   const {
     stageRef,
@@ -96,6 +97,14 @@ export const Canvas = () => {
     return hardCodeUsers.find((u) => u.id == userId) ?? null;
   };
 
+  // Находим выбранный элемент и его renderer
+  const selectedElement = board?.elements.find(
+    (el) => el.id === selectedElementId
+  );
+  
+  const selectedElementRenderer = selectedElement 
+    ? findRenderer(selectedElement)
+    : null;
 
   return (
     <div
@@ -103,6 +112,16 @@ export const Canvas = () => {
       className='relative w-full h-screen'
       style={{ touchAction: 'none' }}
     >
+      {/* Боковая панель настроек */}
+      {selectedElement && selectedElementRenderer?.renderConfigPanel && board && (
+        selectedElementRenderer.renderConfigPanel({
+          element: selectedElement,
+          board,
+          onUpdate: (updatedElement) => {
+            updateElement(updatedElement);
+          },
+        })
+      )}
       <Stage
         ref={stageRef}
         width={window.innerWidth}
@@ -135,6 +154,12 @@ export const Canvas = () => {
             transform: `translate(${stagePos.x}px, ${stagePos.y}px) scale(${stageScale})`,
             transformOrigin: '0 0',
           }}
+          onClick={(e) => {
+            // Снимаем выделение при клике на пустое место
+            if (e.target === e.currentTarget) {
+              setSelectedElementId(null);
+            }
+          }}
         >
           {board?.elements
             .slice()
@@ -150,7 +175,10 @@ export const Canvas = () => {
                 <Fragment key={element.id}>
                   {renderer.render({
                     element,
-                    isSelected: false,
+                    isSelected: selectedElementId === element.id,
+                    onSelect: () => {
+                      setSelectedElementId(element.id);
+                    },
                     onUpdate: (updatedElement) => {
                       updateElement(updatedElement);
                     },
