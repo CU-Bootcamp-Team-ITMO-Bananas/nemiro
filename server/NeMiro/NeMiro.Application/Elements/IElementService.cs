@@ -10,4 +10,5 @@ public interface IElementService
     IList<ElementDto> GetBoardElements(string boardId);
     Task AddElementAsync(ElementDto element, string boardId, CancellationToken cancellationToken);
     Task UpdateElement(ElementDto element, string boardId, CancellationToken cancellationToken);
+    Task DeleteElement(ElementDto element, string boardId, CancellationToken cancellationToken);
 }

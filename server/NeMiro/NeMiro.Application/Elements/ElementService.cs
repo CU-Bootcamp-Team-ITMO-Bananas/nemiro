@@ -50,7 +50,10 @@ public class ElementService : IElementService
     {
         if (_elements.TryGetValue(boardId, out var boardElements))
         {
-            boardElements.Remove(element.Id);
+            if (boardElements.TryGetValue(element.Id, out var elementDto))
+            {
+                boardElements.Remove(element.Id);
+            }
             boardElements.Add(element.Id, element);
             var newElement = new Element()
             {
@@ -61,6 +64,18 @@ public class ElementService : IElementService
                 UpdatedAt = DateTimeOffset.UtcNow
             };
             await _elementRepository.UpdateBatch([newElement], cancellationToken);
+        }
+    }
+
+    public async Task DeleteElement(ElementDto element, string boardId, CancellationToken cancellationToken)
+    {
+        await _elementRepository.Delete(element.Id, cancellationToken);
+        if (_elements.TryGetValue(boardId, out var boardElements))
+        {
+            if (boardElements.TryGetValue(element.Id, out var elementDto))
+            {
+                boardElements.Remove(element.Id);
+            }
         }
     }
 }

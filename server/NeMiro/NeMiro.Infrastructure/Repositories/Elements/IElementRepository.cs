@@ -9,7 +9,7 @@ public interface IElementRepository
 {
     Task Create(Element element, CancellationToken cancellationToken);
 
-    Task Delete(long id, CancellationToken cancellationToken);
+    Task Delete(string id, CancellationToken cancellationToken);
 
     Task UpdateBatch(IReadOnlyCollection<Element> elements, CancellationToken cancellationToken);
 }
