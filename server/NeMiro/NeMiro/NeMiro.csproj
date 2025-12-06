@@ -10,6 +10,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NeMiro.Application\NeMiro.Application.csproj" />
+    <ProjectReference Include="..\NeMiro.Presentation\NeMiro.Presentation.csproj" />
   </ItemGroup>
 
   <ItemGroup>
