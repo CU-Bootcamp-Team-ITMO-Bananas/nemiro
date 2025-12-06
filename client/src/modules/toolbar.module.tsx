@@ -33,7 +33,7 @@ export const Toolbar = ({ isShareModalOpen }: ToolbarProps) => {
       <div className={`flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-lg transition-all ${isShareModalOpen ? 'blur-sm' : ''}`}>
         <button
           onClick={handleCreateSticker}
-          className='w-10 h-10 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-50 active:bg-gray-100 transition-colors'
+          className='w-10 h-10 flex items-center justify-center border border-gray-300 rounded bg-white hover:bg-gray-50 active:bg-gray-100 transition-colors'
           title='Стикер'
           aria-label='Создать стикер'
         >
@@ -41,12 +41,14 @@ export const Toolbar = ({ isShareModalOpen }: ToolbarProps) => {
             xmlns='http://www.w3.org/2000/svg'
             width='20'
             height='20'
-            viewBox='0 0 20 20'
-            fill='#374151'
+            viewBox='0 0 24 24'
+            fill='currentColor'
+            className='text-gray-700'
+            style={{ display: 'block', flexShrink: 0 }}
           >
             <path
               fillRule='evenodd'
-              d='M4 2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4Zm1 2h10v12H5V4Zm2 2v1h6V6H7Zm0 2v1h6V8H7Zm0 2v1h4v-1H7Z'
+              d='M5 2a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h7c5.523 0 10-4.477 10-10V5a3 3 0 0 0-3-3H5Zm15 7V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1v-.004h4a3 3 0 0 0 3-3V13l1-1h4a3 3 0 0 0 3-3Zm-6.952 10.932A4.977 4.977 0 0 0 14 16.996V14h3a4.977 4.977 0 0 0 2.932-.95 8.004 8.004 0 0 1-6.884 6.882Z'
               clipRule='evenodd'
             />
           </svg>

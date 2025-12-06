@@ -246,46 +246,45 @@ export const Sticker = ({
       >
         <div
           className={cn(
-            'relative w-full h-full p-3 rounded-lg shadow-md transition-shadow hover:shadow-lg',
+            'relative w-full h-full rounded-lg shadow-md transition-shadow hover:shadow-lg',
             isSelected && 'ring-2 ring-blue-500'
           )}
           style={{
             backgroundColor,
           }}
         >
-          {isEditing ? (
-            <textarea
-              ref={textareaRef}
-              value={text}
-              onChange={(e) => handleTextChange(e.target.value)}
-              onBlur={handleBlur}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleBlur();
-                }
-                if (e.key === 'Escape') {
-                  handleBlur();
-                }
-              }}
-              className='w-full h-full bg-transparent border-none outline-none resize-none text-gray-900 font-medium text-sm leading-tight'
-              style={{
-                minHeight: '60px',
-              }}
-              placeholder='Введите текст...'
-            />
-          ) : (
-            <div
-              className='w-full h-full text-gray-900 font-medium text-sm leading-tight whitespace-pre-wrap break-words'
-              style={{
-                minHeight: '60px',
-              }}
-            >
-              {text || (
-                <span className='text-gray-500 italic'>Дважды кликните для редактирования</span>
-              )}
-            </div>
-          )}
+          <div className='w-full h-full flex items-center justify-center text-center p-3'>
+            {isEditing ? (
+              <textarea
+                ref={textareaRef}
+                value={text}
+                onChange={(e) => handleTextChange(e.target.value)}
+                onBlur={handleBlur}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleBlur();
+                  }
+                  if (e.key === 'Escape') {
+                    handleBlur();
+                  }
+                }}
+                className='w-full h-full bg-transparent border-none outline-none resize-none text-gray-900 font-medium text-sm leading-tight text-center'
+                style={{
+                  minHeight: '60px',
+                }}
+                placeholder='Введите текст...'
+              />
+            ) : (
+              <div
+                className='text-gray-900 font-medium text-sm leading-tight whitespace-pre-wrap break-words'
+              >
+                {text || (
+                  <span className='text-gray-500 italic'>Дважды кликните для редактирования</span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
   );
