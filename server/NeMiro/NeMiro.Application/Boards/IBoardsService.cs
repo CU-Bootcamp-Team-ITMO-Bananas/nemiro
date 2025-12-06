@@ -8,8 +8,11 @@ namespace NeMiro.Application.Boards;
 
 public interface IBoardsService
 {
-    Task<IEnumerable<Board>> GetBoards(long userId, CancellationToken cancellationToken);
     BoardDto GetBoardByIdAsync(string boardId);
+
     Task<string> CreateBoard(long userId, CancellationToken cancellationToken);
+
     Task UpdateBoard(UpdateBoardRequest request, CancellationToken cancellationToken);
+
+    Task<IEnumerable<Board>> GetBoards(long userId, CancellationToken cancellationToken);
 }

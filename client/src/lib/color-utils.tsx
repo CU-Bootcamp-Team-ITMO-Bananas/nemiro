@@ -1,8 +1,10 @@
 export const generateColoredCursorSVG = (
   color: string,
-  userId: string
+  userId: number
 ): string => {
-  const filterId = `filter0_d_${userId.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const filterId = `filter0_d_${userId
+    .toString()
+    .replace(/[^a-zA-Z0-9]/g, '')}`;
 
   const svgString = `
     <svg width="28" height="29" viewBox="0 0 28 29" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -30,9 +32,11 @@ export const generateColoredCursorSVG = (
 
 export const generateColoredCursorBase64 = (
   color: string,
-  userId: string
+  userId: number
 ): string => {
-  const filterId = `filter0_d_${userId.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const filterId = `filter0_d_${userId
+    .toString()
+    .replace(/[^a-zA-Z0-9]/g, '')}`;
 
   const svgString = `
     <svg width="28" height="29" viewBox="0 0 28 29" fill="none" xmlns="http://www.w3.org2000/svg">
@@ -65,10 +69,6 @@ export const USER_POINTER_COLORS = [
   '#DD2590',
 ] as const;
 
-export const getUserColor = (userId: string): string => {
-  const colors = USER_POINTER_COLORS;
-  const colorIndex = Array.from(userId).reduce((sum, char) => {
-    return (sum + char.charCodeAt(0)) % colors.length;
-  }, 0);
-  return colors[colorIndex];
+export const getUserColor = (userId: number): string => {
+  return USER_POINTER_COLORS[userId % USER_POINTER_COLORS.length];
 };

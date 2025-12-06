@@ -8,6 +8,8 @@ namespace NeMiro.Infrastructure.Repositories.Boards;
 public interface IBoardRepository
 {
     Task Create(Board board, CancellationToken cancellationToken);
+
     Task<Board?> GetById(string id, CancellationToken cancellationToken);
-    Task<IReadOnlyCollection<Board>> GetBoardsByUserId(long id, CancellationToken cancellationToken);
+
+    Task<IReadOnlyCollection<Board>> GetBoardsByUserId(long userId, CancellationToken cancellationToken);
 }

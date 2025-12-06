@@ -14,23 +14,20 @@ interface StickerProps {
 export const Sticker = ({
   element,
   onUpdate,
-  onDelete,
   isSelected = false,
   onSelect,
 }: StickerProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [text, setText] = useState<string>(
-    element.content?.text || ''
-  );
+  const [text, setText] = useState<string>(element.content?.text || '');
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const stickerRef = useRef<HTMLDivElement>(null);
 
-  const content = element.content;
-  const width = content?.width || 100;
-  const height = content?.height || 100;
-  const colorIndex = element.color || 0;
+  const content = element.content || { text: '' };
+  const width = content.width ?? 200;
+  const height = content.height ?? 200;
+  const colorIndex = element.content.color ?? 0;
   const backgroundColor = STICKER_COLORS[colorIndex % STICKER_COLORS.length];
 
   // Автоматическое изменение размера textarea
@@ -56,47 +53,21 @@ export const Sticker = ({
     }
   }, [isEditing]);
 
-  // Обработка удаления стикера по нажатию Command/Ctrl + Backspace
-  useEffect(() => {
-    if (isEditing || !onDelete) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Проверяем, что фокус не в input/textarea
-      const activeElement = document.activeElement;
-      if (
-        activeElement &&
-        (activeElement.tagName === 'INPUT' ||
-          activeElement.tagName === 'TEXTAREA')
-      ) {
-        return;
-      }
-
-      // Command/Ctrl + Backspace - удаляет независимо от выбора
-      const isModifierPressed = e.metaKey || e.ctrlKey;
-      if (isModifierPressed && e.key === 'Backspace') {
-        e.preventDefault();
-        e.stopPropagation();
-        onDelete(element.id);
-        return;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isSelected, isEditing, onDelete, element.id]);
-
   const handleTextChange = (newText: string) => {
     setText(newText);
     if (onUpdate) {
       onUpdate({
-        ...element,
+        id: element.id,
         content: {
-          ...content,
           text: newText,
-          width,
-          height,
+          width: content.width,
+          height: content.height,
+          x: element.content.x,
+          y: element.content.y,
+          scale: element.content.scale,
+          rotation: element.content.rotation,
+          zIndex: element.content.zIndex,
+          color: element.content.color,
         },
       });
     }
@@ -107,12 +78,17 @@ export const Sticker = ({
     // Убеждаемся, что текст сохранен при выходе из редактирования
     if (onUpdate && text !== element.content?.text) {
       onUpdate({
-        ...element,
+        id: element.id,
         content: {
-          ...content,
           text: text,
-          width,
-          height,
+          width: content.width,
+          height: content.height,
+          x: element.content.x,
+          y: element.content.y,
+          scale: element.content.scale,
+          rotation: element.content.rotation,
+          zIndex: element.content.zIndex,
+          color: element.content.color,
         },
       });
     }
@@ -139,9 +115,9 @@ export const Sticker = ({
 
       e.preventDefault();
       e.stopPropagation();
-      
+
       setIsDragging(true);
-      
+
       // Вычисляем смещение мыши относительно элемента в координатах stage
       const parent = stickerRef.current?.parentElement;
       if (parent) {
@@ -163,19 +139,19 @@ export const Sticker = ({
 
         const relativeX = e.clientX - parentRect.left;
         const relativeY = e.clientY - parentRect.top;
-        
+
         // Координаты мыши в системе координат stage
         const stageMouseX = (relativeX - translateX) / scale;
         const stageMouseY = (relativeY - translateY) / scale;
-        
+
         // Смещение относительно позиции элемента
         setDragStart({
-          x: stageMouseX - element.x,
-          y: stageMouseY - element.y,
+          x: stageMouseX - element.content.x,
+          y: stageMouseY - element.content.y,
         });
       }
     },
-    [element.x, element.y]
+    [element.content.x, element.content.y]
   );
 
   useEffect(() => {
@@ -189,7 +165,7 @@ export const Sticker = ({
       if (!parent) return;
 
       const parentRect = parent.getBoundingClientRect();
-      
+
       // Получаем transform матрицу родительского контейнера
       const transform = getComputedStyle(parent).transform;
       let scale = 1;
@@ -216,9 +192,18 @@ export const Sticker = ({
       const newY = (relativeY - translateY) / scale - dragStart.y;
 
       onUpdate({
-        ...element,
-        x: Math.max(0, newX),
-        y: Math.max(0, newY),
+        id: element.id,
+        content: {
+          text: element.content?.text ?? '',
+          width: element.content?.width,
+          height: element.content?.height,
+          x: Math.max(0, newX),
+          y: Math.max(0, newY),
+          scale: element.content.scale,
+          rotation: element.content.rotation,
+          zIndex: element.content.zIndex,
+          color: element.content.color,
+        },
       });
     };
 
@@ -235,36 +220,36 @@ export const Sticker = ({
     };
   }, [isDragging, dragStart, element, onUpdate]);
 
-
   return (
     <div
-        ref={stickerRef}
+      ref={stickerRef}
+      className={cn(
+        'absolute select-none',
+        isDragging ? 'cursor-grabbing' : 'cursor-move'
+      )}
+      style={{
+        left: `${element.content.x}px`,
+        top: `${element.content.y}px`,
+        transform: `rotate(${element.content.rotation}deg) scale(${element.content.scale})`,
+        zIndex: element.content.zIndex,
+        width: `${width}px`,
+        height: `${height}px`,
+        userSelect: 'none',
+      }}
+      onMouseDown={handleMouseDown}
+      onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
+    >
+      <div
         className={cn(
-          'absolute select-none',
-          isDragging ? 'cursor-grabbing' : 'cursor-move'
+          'relative w-full h-full rounded-lg shadow-md transition-shadow hover:shadow-lg',
+          isSelected && 'ring-2 ring-blue-500'
         )}
         style={{
-          left: `${element.x}px`,
-          top: `${element.y}px`,
-          transform: `rotate(${element.rotation}deg) scale(${element.scale})`,
-          zIndex: element.zIndex,
-          width: `${width}px`,
-          height: `${height}px`,
-          userSelect: 'none',
+          backgroundColor,
         }}
-        onMouseDown={handleMouseDown}
-        onClick={handleClick}
-        onDoubleClick={handleDoubleClick}
       >
-        <div
-          className={cn(
-            'relative w-full h-full p-3 rounded-lg shadow-md transition-shadow hover:shadow-lg',
-            isSelected && 'ring-2 ring-blue-500'
-          )}
-          style={{
-            backgroundColor,
-          }}
-        >
+        <div className='w-full h-full flex items-center justify-center text-center p-3'>
           {isEditing ? (
             <textarea
               ref={textareaRef}
@@ -280,26 +265,23 @@ export const Sticker = ({
                   handleBlur();
                 }
               }}
-              className='w-full h-full bg-transparent border-none outline-none resize-none text-gray-900 font-medium text-sm leading-tight'
+              className='w-full h-full bg-transparent border-none outline-none resize-none text-gray-900 font-medium text-sm leading-tight text-center'
               style={{
                 minHeight: '60px',
               }}
               placeholder='Введите текст...'
             />
           ) : (
-            <div
-              className='w-full h-full text-gray-900 font-medium text-sm leading-tight whitespace-pre-wrap break-words'
-              style={{
-                minHeight: '60px',
-              }}
-            >
+            <div className='text-gray-900 font-medium text-sm leading-tight whitespace-pre-wrap break-words'>
               {text || (
-                <span className='text-gray-500 italic'>Дважды кликните для редактирования</span>
+                <span className='text-gray-500 italic'>
+                  Дважды кликните для редактирования
+                </span>
               )}
             </div>
           )}
         </div>
       </div>
+    </div>
   );
 };
-

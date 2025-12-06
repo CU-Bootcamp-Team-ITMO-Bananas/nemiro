@@ -17,7 +17,7 @@ export const Login = () => {
     // });
 
     login({
-      id: (Math.random() * 10000).toFixed(0),
+      id: Math.random() * 10000,
       username: data.username ?? data.first_name,
       avatar: data.photo_url ?? null,
       telegram: data.id,

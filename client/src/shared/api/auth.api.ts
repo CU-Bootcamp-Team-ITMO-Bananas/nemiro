@@ -8,11 +8,8 @@ export const loginUser = async (
   try {
     const res = await axiosInstance.post<User>('auth', {
       id: authData.id,
-      firstName: authData.first_name,
-      lastName: authData.last_name,
       username: authData.username,
       photoUrl: authData.photo_url,
-      hash: authData.hash,
     });
     return res.data;
   } catch (err) {

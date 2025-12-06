@@ -26,51 +26,83 @@ export const StickerConfigMenu = ({
   board,
   onUpdate,
 }: StickerConfigMenuProps) => {
-  const colorIndex = element.color || 0;
+  const colorIndex = element.content.color || 0;
 
   const handleColorChange = (newColorIndex: number) => {
     if (onUpdate) {
       onUpdate({
-        ...element,
-        color: newColorIndex,
+        id: element.id,
+        content: {
+          text: element.content?.text ?? '',
+          width: element.content?.width,
+          height: element.content?.height,
+          x: element.content.x,
+          y: element.content.y,
+          scale: element.content.scale,
+          rotation: element.content.rotation,
+          zIndex: element.content.zIndex,
+          color: newColorIndex,
+        },
       });
     }
   };
 
-  const handleZIndexChange = (direction: 'up' | 'down') => {
-    if (!onUpdate) return;
+  // const handleZIndexChange = (direction: 'up' | 'down') => {
+  //   if (!onUpdate) return;
 
-    const sortedElements = [...board.elements].sort((a, b) => a.zIndex - b.zIndex);
-    const currentIndex = sortedElements.findIndex((el) => el.id === element.id);
+  //   const sortedElements = [...board.elements].sort(
+  //     (a, b) => a.zIndex - b.zIndex
+  //   );
+  //   const currentIndex = sortedElements.findIndex((el) => el.id === element.id);
 
-    if (currentIndex === -1) return;
+  //   if (currentIndex === -1) return;
 
-    if (direction === 'up') {
-      // Перемещаем вперед (увеличиваем zIndex)
-      if (currentIndex < sortedElements.length - 1) {
-        const nextElement = sortedElements[currentIndex + 1];
-        const newZIndex = nextElement.zIndex + 1;
-        onUpdate({
-          ...element,
-          zIndex: newZIndex,
-        });
-      }
-    } else {
-      // Перемещаем назад (уменьшаем zIndex)
-      if (currentIndex > 0) {
-        const prevElement = sortedElements[currentIndex - 1];
-        const newZIndex = Math.max(0, prevElement.zIndex - 1);
-        onUpdate({
-          ...element,
-          zIndex: newZIndex,
-        });
-      }
-    }
-  };
+  //   if (direction === 'up') {
+  //     // Перемещаем вперед (увеличиваем zIndex)
+  //     if (currentIndex < sortedElements.length - 1) {
+  //       const nextElement = sortedElements[currentIndex + 1];
+  //       const newZIndex = nextElement.zIndex + 1;
+  //       onUpdate({
+  //         id: element.id,
+  //         x: element.x,
+  //         y: element.y,
+  //         scale: element.scale,
+  //         rotation: element.rotation,
+  //         zIndex: newZIndex,
+  //         color: element.color,
+  //         content: {
+  //           text: element.content?.text ?? '',
+  //           width: element.content?.width,
+  //           height: element.content?.height,
+  //         },
+  //       });
+  //     }
+  //   } else {
+  //     // Перемещаем назад (уменьшаем zIndex)
+  //     if (currentIndex > 0) {
+  //       const prevElement = sortedElements[currentIndex - 1];
+  //       const newZIndex = Math.max(0, prevElement.content.zIndex - 1);
+  //       onUpdate({
+  //         id: element.id,
+  //         content: {
+  //           text: element.content?.text ?? '',
+  //           width: element.content?.width,
+  //           height: element.content?.height,
+  //           x: element.content.x,
+  //           y: element.content.y,
+  //           scale: element.content.scale,
+  //           rotation: element.content.rotation,
+  //           zIndex: newZIndex,
+  //           color: element.content.color,
+  //         },
+  //       });
+  //     }
+  //   }
+  // };
 
   return (
     <div
-      className='fixed left-0 top-1/2 -translate-y-1/2 bg-blue-50 shadow-lg border-r border-blue-200 rounded-r-lg p-4 pointer-events-auto'
+      className='fixed left-0 top-1/2 -translate-y-1/2 bg-gray-100 shadow-lg border-r rounded-r-lg p-4 pointer-events-auto'
       style={{
         width: '200px',
         zIndex: 10000, // Очень высокий z-index, чтобы меню было поверх всех элементов
@@ -79,11 +111,11 @@ export const StickerConfigMenu = ({
     >
       <div className='space-y-4'>
         {/* Секция изменения порядка */}
-        <div>
+        {/* <div>
           <h3 className='text-sm font-medium text-gray-700 mb-2'>Порядок</h3>
           <div className='flex gap-2'>
             <button
-              onClick={() => handleZIndexChange('down')}
+              // onClick={() => handleZIndexChange('down')}
               className='flex-1 flex items-center justify-center p-2 bg-white border border-gray-300 rounded hover:bg-gray-50 active:bg-gray-100 transition-colors'
               title='Переместить назад'
               aria-label='Переместить элемент назад'
@@ -91,7 +123,7 @@ export const StickerConfigMenu = ({
               <ChevronDown className='w-4 h-4 text-gray-700' />
             </button>
             <button
-              onClick={() => handleZIndexChange('up')}
+              // onClick={() => handleZIndexChange('up')}
               className='flex-1 flex items-center justify-center p-2 bg-white border border-gray-300 rounded hover:bg-gray-50 active:bg-gray-100 transition-colors'
               title='Переместить вперед'
               aria-label='Переместить элемент вперед'
@@ -99,7 +131,7 @@ export const StickerConfigMenu = ({
               <ChevronUp className='w-4 h-4 text-gray-700' />
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* Секция выбора цвета */}
         <div>
@@ -128,4 +160,3 @@ export const StickerConfigMenu = ({
     </div>
   );
 };
-

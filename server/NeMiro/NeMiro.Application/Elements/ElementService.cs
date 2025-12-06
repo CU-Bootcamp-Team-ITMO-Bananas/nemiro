@@ -40,20 +40,42 @@ public class ElementService : IElementService
 
         _elements.Add(
             boardId,
-            new Dictionary<string, ElementDto>(
+            new Dictionary<string, ElementDto>
             {
-                { element.Id, element }
+                { element.Id, element },
             });
     }
 
-    public void UpdateElement(ElementDto element, string boardId)
+    public async Task UpdateElement(ElementDto element, string boardId, CancellationToken cancellationToken)
     {
-        if (!_elements.TryGetValue(boardId, out var boardElements))
+        if (_elements.TryGetValue(boardId, out var boardElements))
         {
-            return;
+            if (boardElements.TryGetValue(element.Id, out var elementDto))
+            {
+                boardElements.Remove(element.Id);
+            }
+            boardElements.Add(element.Id, element);
+            var newElement = new Element()
+            {
+                Id = element.Id,
+                BoardId = boardId,
+                CreatedAt = DateTimeOffset.UtcNow,
+                Content = element.Content,
+                UpdatedAt = DateTimeOffset.UtcNow
+            };
+            await _elementRepository.UpdateBatch([newElement], cancellationToken);
         }
+    }
 
-        boardElements.Remove(element.Id);
-        boardElements.Add(element.Id, element);
+    public async Task DeleteElement(ElementDto element, string boardId, CancellationToken cancellationToken)
+    {
+        await _elementRepository.Delete(element.Id, cancellationToken);
+        if (_elements.TryGetValue(boardId, out var boardElements))
+        {
+            if (boardElements.TryGetValue(element.Id, out var elementDto))
+            {
+                boardElements.Remove(element.Id);
+            }
+        }
     }
 }

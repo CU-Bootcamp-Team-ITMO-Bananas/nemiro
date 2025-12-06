@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -27,6 +28,7 @@ public class UserService : IUserService
     public async Task JoinBoardUser(string boardId, long userId, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetUserAsync(userId, cancellationToken);
+        if (user is null) return;
         if (_users.TryGetValue(boardId, out var boardUsers))
         {
             boardUsers.Add(userId, user);

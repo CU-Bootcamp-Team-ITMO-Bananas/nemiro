@@ -37,7 +37,7 @@ export const HubContextProvider = ({
 }: {
   children: ReactNode;
   boardId: string;
-  userId: string;
+  userId: number;
 }) => {
   const [connection, setConnection] = useState<HubConnection | null>(null);
   const [connectionStarted, setConnectionStarted] = useState(false);
@@ -73,7 +73,7 @@ export const HubContextProvider = ({
     }
 
     const loggingCallback = (data: unknown) => {
-      // console.info(`[socket] < ${event}`, data);
+      console.info(`[socket] < ${event}`, data);
       callback(data as T);
     };
 
@@ -90,7 +90,7 @@ export const HubContextProvider = ({
   };
 
   const emit = (event: string, data: unknown) => {
-    // console.info(`[socket] > ${event}`, data);
+    console.info(`[socket] > ${event}`, data);
     connection?.invoke(event, data);
   };
 

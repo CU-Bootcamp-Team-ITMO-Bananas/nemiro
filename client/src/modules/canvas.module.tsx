@@ -8,10 +8,14 @@ import { useBoardStore } from '@/shared/stores/board.store';
 import { findRenderer } from '@/shared/renderers/element-renderer.registry';
 import { useCallback, useEffect, useRef, Fragment, useState } from 'react';
 import { Stage, Layer } from 'react-konva';
+import { BoardElement } from '@/shared/interfaces/board/board-element.interface';
+import { ElementEvent } from '@/shared/interfaces/events/element-update-event.interface';
 
 export const Canvas = () => {
   const { board, updateBoard, updateElement, removeElement } = useBoardStore();
-  const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
+  const [selectedElementId, setSelectedElementId] = useState<string | null>(
+    null
+  );
   const { subscribe, emit, connection } = useHub();
   const {
     stageRef,
@@ -22,6 +26,11 @@ export const Canvas = () => {
     handleTouchMove,
     handleTouchEnd,
   } = useStageZoomPan();
+
+  const onUpdateElement = (element: BoardElement) => {
+    emit<ElementEvent>('UpdateElement', element);
+    updateElement(element);
+  };
 
   const lastEmitTime = useRef(0);
   const emitThrottleMs = 100;
@@ -75,8 +84,35 @@ export const Canvas = () => {
     };
   }, [connection, subscribe, updateBoard]);
 
+  // Обработка удаления выбранного элемента по Backspace
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Проверяем, что фокус не в input/textarea
+      const activeElement = document.activeElement;
+      if (
+        activeElement &&
+        (activeElement.tagName === 'INPUT' ||
+          activeElement.tagName === 'TEXTAREA')
+      ) {
+        return;
+      }
 
-  const getUserById = (userId: string): User | null => {
+      // Backspace - удаляет выбранный элемент
+      if (e.key === 'Backspace' && selectedElementId) {
+        e.preventDefault();
+        e.stopPropagation();
+        removeElement(selectedElementId);
+        setSelectedElementId(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedElementId, removeElement]);
+
+  const getUserById = (userId: number): User | null => {
     return board?.users.find((u) => u.id == userId) ?? null;
   };
 
@@ -84,8 +120,8 @@ export const Canvas = () => {
   const selectedElement = board?.elements.find(
     (el) => el.id === selectedElementId
   );
-  
-  const selectedElementRenderer = selectedElement 
+
+  const selectedElementRenderer = selectedElement
     ? findRenderer(selectedElement)
     : null;
 
@@ -96,15 +132,16 @@ export const Canvas = () => {
       style={{ touchAction: 'none' }}
     >
       {/* Боковая панель настроек */}
-      {selectedElement && selectedElementRenderer?.renderConfigPanel && board && (
+      {selectedElement &&
+        selectedElementRenderer?.renderConfigPanel &&
+        board &&
         selectedElementRenderer.renderConfigPanel({
           element: selectedElement,
           board,
           onUpdate: (updatedElement) => {
             updateElement(updatedElement);
           },
-        })
-      )}
+        })}
       <Stage
         ref={stageRef}
         width={window.innerWidth}
@@ -123,16 +160,22 @@ export const Canvas = () => {
           {board?.pointers?.map((pointer) => {
             const user = getUserById(pointer.userId);
             if (user) {
-              return <Pointer user={user} pointer={pointer} />;
+              return (
+                <Pointer
+                  key={`user_pointer_${pointer.userId}`}
+                  user={user}
+                  pointer={pointer}
+                />
+              );
             }
           })}
         </Layer>
       </Stage>
 
       <div className='absolute inset-0 pointer-events-none overflow-hidden'>
-        <div 
-          className='relative w-full h-full' 
-          style={{ 
+        <div
+          className='relative w-full h-full'
+          style={{
             pointerEvents: 'auto',
             transform: `translate(${stagePos.x}px, ${stagePos.y}px) scale(${stageScale})`,
             transformOrigin: '0 0',
@@ -146,7 +189,7 @@ export const Canvas = () => {
         >
           {board?.elements
             .slice()
-            .sort((a, b) => a.zIndex - b.zIndex)
+            // .sort((a, b) => a.content.zIndex - b.zIndex)
             .map((element) => {
               const renderer = findRenderer(element);
               if (!renderer) {
@@ -163,7 +206,7 @@ export const Canvas = () => {
                       setSelectedElementId(element.id);
                     },
                     onUpdate: (updatedElement) => {
-                      updateElement(updatedElement);
+                      onUpdateElement(updatedElement);
                     },
                     onDelete: (elementId) => {
                       removeElement(elementId);

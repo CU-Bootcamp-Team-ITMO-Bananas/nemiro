@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NeMiro.Application.DTOs;
@@ -24,18 +25,17 @@ public class BoardsService : IBoardsService
 
     private readonly IElementService _elementService;
 
-    public BoardsService(IBoardRepository boardRepository, IPointerService pointerService, IUserService userService, IElementService elementService)
+    public BoardsService(
+        IBoardRepository boardRepository,
+        IPointerService pointerService,
+        IUserService userService,
+        IElementService elementService)
     {
         _boardRepository = boardRepository;
         _pointerService = pointerService;
         _userService = userService;
         _elementService = elementService;
         _boardDictionary = new Dictionary<string, BoardDto>();
-    }
-
-    public async Task<IEnumerable<Board>> GetBoards(long userId, CancellationToken cancellationToken)
-    {
-        return await _boardRepository.GetBoardsByUserId(userId, cancellationToken);
     }
 
     public BoardDto GetBoardByIdAsync(string boardId)
@@ -71,6 +71,11 @@ public class BoardsService : IBoardsService
         throw new NotImplementedException();
     }
 
+    public async Task<IEnumerable<Board>> GetBoards(long userId, CancellationToken cancellationToken)
+    {
+        return await _boardRepository.GetBoardsByUserId(userId, cancellationToken);
+    }
+
     private async Task<Board> GetStoredOrCreateBoard(string boardId, long ownerId, CancellationToken cancellationToken)
     {
         var storedBoard = await _boardRepository.GetById(boardId, cancellationToken);
@@ -78,20 +83,13 @@ public class BoardsService : IBoardsService
 
         var board = new Board
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = boardId,
             OwnerId = ownerId,
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = null,
         };
-        await _boardRepository.Create(
-            new Board
-            {
-                Id = Guid.NewGuid().ToString(),
-                OwnerId = ownerId,
-                CreatedAt = DateTimeOffset.UtcNow,
-                UpdatedAt = null,
-            },
-            cancellationToken);
+
+        await _boardRepository.Create(board, cancellationToken);
 
         return board;
     }
