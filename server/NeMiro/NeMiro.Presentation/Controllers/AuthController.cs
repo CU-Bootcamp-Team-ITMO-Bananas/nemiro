@@ -8,18 +8,11 @@ using NeMiro.Models.Users;
 namespace NeMiro.Presentation.Controllers;
 
 [Route("api/v1/auth")]
-public class AuthController : ControllerBase
+public class AuthController(IAuthService authService) : ControllerBase
 {
-    private readonly IAuthService _authService;
-
-    public AuthController(IAuthService authService)
-    {
-        _authService = authService;
-    }
-
     [HttpPost]
     public async Task<ActionResult<User>> Login([FromBody] AuthRequest request, CancellationToken ct)
     {
-        return await _authService.Login(request);
+        return await authService.Login(request, ct);
     }
 }
