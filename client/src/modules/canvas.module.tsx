@@ -1,7 +1,9 @@
+import { Pointer } from '@/components/canvas/pointer';
 import { useHub } from '@/shared/context/hub.context';
 import { useStageZoomPan } from '@/shared/hooks/useStageZoomPan';
 import { Board } from '@/shared/interfaces/board/board.interface';
 import { PointerUpdateEvent } from '@/shared/interfaces/events/pointer-update-event.interface';
+import { User } from '@/shared/interfaces/user.interface';
 import { useBoardStore } from '@/shared/stores/board.store';
 import { useCallback, useEffect, useRef } from 'react';
 import { Stage, Layer, Rect, Circle, Group } from 'react-konva';
@@ -71,18 +73,26 @@ export const Canvas = () => {
     };
   }, [connection, subscribe, updateBoard]);
 
-  const getUserColor = (userId: number): string => {
-    const colors = [
-      '#FF6B6B', // Red
-      '#4ECDC4', // Teal
-      '#FFD166', // Yellow
-      '#06D6A0', // Green
-      '#118AB2', // Blue
-      '#EF476F', // Pink
-      '#073B4C', // Dark Blue
-      '#7209B7', // Purple
-    ];
-    return colors[userId % colors.length];
+
+  const hardCodeUsers = [
+    {
+      id: '21607',
+      username: 'Jillian_dangerous',
+      avatar:
+        'https://upload.wikimedia.org/wikipedia/commons/4/43/Bonnet_macaque_%28Macaca_radiata%29_Photograph_By_Shantanu_Kuveskar.jpg',
+      telegram: 0,
+    },
+    {
+      id: '25038',
+      username: 'Agathe_scared',
+      avatar:
+        'https://upload.wikimedia.org/wikipedia/commons/4/43/Bonnet_macaque_%28Macaca_radiata%29_Photograph_By_Shantanu_Kuveskar.jpg',
+      telegram: 0,
+    },
+  ];
+
+  const getUserById = (userId: string): User | null => {
+    return hardCodeUsers.find((u) => u.id == userId) ?? null;
   };
 
   return (
@@ -107,35 +117,10 @@ export const Canvas = () => {
       >
         <Layer>
           {board?.pointers?.map((pointer) => {
-            const color = getUserColor(pointer.userId);
-
-            return (
-              <Group
-                key={`pointer-${pointer.userId}`}
-                x={pointer.x}
-                y={pointer.y}
-              >
-                {/* Pointer circle */}
-                <Circle
-                  radius={20}
-                  fill={color}
-                  opacity={0.8}
-                  stroke='white'
-                  strokeWidth={2}
-                  shadowColor='black'
-                  shadowBlur={5}
-                  shadowOpacity={0.3}
-                />
-
-                {/* Pointer trail (optional visual effect) */}
-                <Circle
-                  radius={25}
-                  fill={color}
-                  opacity={0.3}
-                  listening={false}
-                />
-              </Group>
-            );
+            const user = getUserById(pointer.userId);
+            if (user) {
+              return <Pointer user={user} pointer={pointer} />;
+            }
           })}
         </Layer>
         <Layer>

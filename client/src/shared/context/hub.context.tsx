@@ -71,7 +71,7 @@ export const HubContextProvider = ({
     }
 
     const loggingCallback = (data: unknown) => {
-      console.info(`[socket] < ${event}`, data);
+      // console.info(`[socket] < ${event}`, data);
       callback(data as T);
     };
 
@@ -88,7 +88,7 @@ export const HubContextProvider = ({
   };
 
   const emit = (event: string, data: unknown) => {
-    console.info(`[socket] > ${event}`, data);
+    // console.info(`[socket] > ${event}`, data);
     connection?.invoke(event, data);
   };
 
