@@ -70,7 +70,7 @@ export const StickerConfigMenu = ({
 
   return (
     <div
-      className='fixed left-0 top-1/2 -translate-y-1/2 bg-blue-50 shadow-lg border-r border-blue-200 rounded-r-lg p-4 pointer-events-auto'
+      className='fixed left-0 top-1/2 -translate-y-1/2 bg-gray-100 shadow-lg border-r rounded-r-lg p-4 pointer-events-auto'
       style={{
         width: '200px',
         zIndex: 10000, // Очень высокий z-index, чтобы меню было поверх всех элементов
