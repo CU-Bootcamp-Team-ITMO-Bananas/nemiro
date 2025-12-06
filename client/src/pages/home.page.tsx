@@ -12,7 +12,6 @@ export const HomePage = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [boardId, setBoardId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -61,7 +60,10 @@ export const HomePage = () => {
 
   return (
     <HubContextProvider boardId={boardId || urlBoardId} userId={user.id}>
-      <Header isShareModalOpen={isShareModalOpen} setIsShareModalOpen={setIsShareModalOpen} />
+      <Header
+        isShareModalOpen={isShareModalOpen}
+        setIsShareModalOpen={setIsShareModalOpen}
+      />
       <Canvas />
       <Toolbar isShareModalOpen={isShareModalOpen} />
     </HubContextProvider>
