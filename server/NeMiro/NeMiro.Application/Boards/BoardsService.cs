@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NeMiro.Application.DTOs;
+using NeMiro.Application.Pointers;
 using NeMiro.Infrastructure.Repositories.Boards;
 using NeMiro.Models.Boards;
+using NeMiro.Models.Users;
 
 namespace NeMiro.Application.Boards;
 
@@ -12,31 +14,20 @@ public class BoardsService : IBoardsService
 {
     private readonly Dictionary<string, BoardDto> _boardDictionary;
     private readonly IBoardRepository _boardRepository;
+    private readonly IPointerService _pointerService;
 
-    public BoardsService(IBoardRepository boardRepository)
+    public BoardsService(IBoardRepository boardRepository, IPointerService pointerService)
     {
         _boardRepository = boardRepository;
+        _pointerService = pointerService;
         _boardDictionary = new Dictionary<string, BoardDto>();
     }
 
-    public async Task<Board?> GetBoardByIdAsync(string boardId, CancellationToken cancellationToken)
+    public async Task<BoardDto?> GetBoardByIdAsync(string boardId, CancellationToken cancellationToken)
     {
-        _boardDictionary.TryGetValue(boardId, out var board);
-
-        if (board == null)
-        {
-            // var storedBoard = await GetStoredOrCreateBoard(boardId, ownerId);
-            // _boardDictionary.Add(
-            //     boardId,
-            //     new BoardDto
-            //     {
-            //         Id = storedBoard.Id,
-            //         Users = [],
-            //         Pointers = [],
-            //     });
-        }
-
-        return null;
+        var pointers = _pointerService.GetBoardPointers(boardId);
+        var board = new BoardDto(boardId, new List<User>(), pointers);
+        return board;
     }
 
     public async Task<string> CreateBoard(long userId, CancellationToken cancellationToken)

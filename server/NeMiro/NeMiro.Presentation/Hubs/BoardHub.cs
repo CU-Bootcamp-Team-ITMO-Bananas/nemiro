@@ -1,9 +1,7 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using NeMiro.Application.Boards;
 using NeMiro.Application.DTOs;
-using NeMiro.Models.Boards;
 
 namespace NeMiro.Presentation.Hubs;
 
@@ -63,15 +61,24 @@ public class BoardHub : Hub
 
     public async Task UpdatePointer(PointerDto pointer)
     {
+        var httpContext = Context.GetHttpContext();
         var userId = (long)Context.Items["user_id"]!;
         var boardId = Context.Items["board_id"] as string;
+        var cancellationToken = httpContext.RequestAborted;
 
-        var pointerDto = new Pointer
-        {
-            X = pointer.X,
-            Y = pointer.Y,
-            UserId = userId
-        };
+        var board = await _boardService.GetBoardByIdAsync(boardId, cancellationToken);
+
+        await Clients.OthersInGroup($"board-{boardId}")
+            .SendAsync(
+                "BoardUpdate",
+                board);
+    }
+
+    public async Task UpdateElement(ElementDto element)
+    {
+        var boardId = Context.Items["board_id"] as string;
+
+        await _boardService.UpdateBoard()
 
         await Clients.OthersInGroup($"board-{boardId}")
             .SendAsync(
