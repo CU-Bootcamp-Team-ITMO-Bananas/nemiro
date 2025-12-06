@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using NeMiro.Application.Boards;
 using NeMiro.Application.DTOs;
+using NeMiro.Application.Elements;
 using NeMiro.Application.Pointers;
 using NeMiro.Application.Users;
 
@@ -14,14 +15,16 @@ public class BoardHub : Hub
     private readonly IBoardsService _boardService;
     private readonly IUserService _userService;
     private readonly IPointerService _pointerService;
+    private readonly IElementService _elementService;
     private readonly IHubContext<BoardHub> _hubContext;
 
-    public BoardHub(IBoardsService boardService, IHubContext<BoardHub> hubContext, IUserService userService, IPointerService pointerService)
+    public BoardHub(IBoardsService boardService, IHubContext<BoardHub> hubContext, IUserService userService, IPointerService pointerService, IElementService elementService)
     {
         _boardService = boardService;
         _hubContext = hubContext;
         _userService = userService;
         _pointerService = pointerService;
+        _elementService = elementService;
     }
 
     public override async Task OnConnectedAsync()
@@ -77,5 +80,14 @@ public class BoardHub : Hub
             .SendAsync(
                 "BoardUpdate",
                 board);
+    }
+
+    public async Task UpdateElement(ElementDto element)
+    {
+        var httpContext = Context.GetHttpContext();
+        var cancellationToken = httpContext.RequestAborted;
+        var boardId = Context.Items["board_id"] as string;
+
+        await _elementService.AddElementAsync(element, boardId, cancellationToken);
     }
 }
