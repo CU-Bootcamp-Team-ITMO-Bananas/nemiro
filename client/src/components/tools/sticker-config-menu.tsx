@@ -31,8 +31,18 @@ export const StickerConfigMenu = ({
   const handleColorChange = (newColorIndex: number) => {
     if (onUpdate) {
       onUpdate({
-        ...element,
+        id: element.id,
+        x: element.x,
+        y: element.y,
+        scale: element.scale,
+        rotation: element.rotation,
+        zIndex: element.zIndex,
         color: newColorIndex,
+        content: {
+          text: element.content?.text ?? '',
+          width: element.content?.width,
+          height: element.content?.height,
+        },
       });
     }
   };
@@ -51,8 +61,18 @@ export const StickerConfigMenu = ({
         const nextElement = sortedElements[currentIndex + 1];
         const newZIndex = nextElement.zIndex + 1;
         onUpdate({
-          ...element,
+          id: element.id,
+          x: element.x,
+          y: element.y,
+          scale: element.scale,
+          rotation: element.rotation,
           zIndex: newZIndex,
+          color: element.color,
+          content: {
+            text: element.content?.text ?? '',
+            width: element.content?.width,
+            height: element.content?.height,
+          },
         });
       }
     } else {
@@ -61,8 +81,18 @@ export const StickerConfigMenu = ({
         const prevElement = sortedElements[currentIndex - 1];
         const newZIndex = Math.max(0, prevElement.zIndex - 1);
         onUpdate({
-          ...element,
+          id: element.id,
+          x: element.x,
+          y: element.y,
+          scale: element.scale,
+          rotation: element.rotation,
           zIndex: newZIndex,
+          color: element.color,
+          content: {
+            text: element.content?.text ?? '',
+            width: element.content?.width,
+            height: element.content?.height,
+          },
         });
       }
     }

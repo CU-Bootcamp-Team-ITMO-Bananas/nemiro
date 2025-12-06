@@ -14,7 +14,6 @@ interface StickerProps {
 export const Sticker = ({
   element,
   onUpdate,
-  onDelete,
   isSelected = false,
   onSelect,
 }: StickerProps) => {
@@ -27,10 +26,10 @@ export const Sticker = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const stickerRef = useRef<HTMLDivElement>(null);
 
-  const content = element.content;
-  const width = content?.width || 100;
-  const height = content?.height || 100;
-  const colorIndex = element.color || 0;
+  const content = element.content || { text: '' };
+  const width = content.width ?? 200;
+  const height = content.height ?? 200;
+  const colorIndex = element.color ?? 0;
   const backgroundColor = STICKER_COLORS[colorIndex % STICKER_COLORS.length];
 
   // Автоматическое изменение размера textarea
@@ -56,47 +55,22 @@ export const Sticker = ({
     }
   }, [isEditing]);
 
-  // Обработка удаления стикера по нажатию Command/Ctrl + Backspace
-  useEffect(() => {
-    if (isEditing || !onDelete) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Проверяем, что фокус не в input/textarea
-      const activeElement = document.activeElement;
-      if (
-        activeElement &&
-        (activeElement.tagName === 'INPUT' ||
-          activeElement.tagName === 'TEXTAREA')
-      ) {
-        return;
-      }
-
-      // Command/Ctrl + Backspace - удаляет независимо от выбора
-      const isModifierPressed = e.metaKey || e.ctrlKey;
-      if (isModifierPressed && e.key === 'Backspace') {
-        e.preventDefault();
-        e.stopPropagation();
-        onDelete(element.id);
-        return;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isSelected, isEditing, onDelete, element.id]);
 
   const handleTextChange = (newText: string) => {
     setText(newText);
     if (onUpdate) {
       onUpdate({
-        ...element,
+        id: element.id,
+        x: element.x,
+        y: element.y,
+        scale: element.scale,
+        rotation: element.rotation,
+        zIndex: element.zIndex,
+        color: element.color,
         content: {
-          ...content,
           text: newText,
-          width,
-          height,
+          width: content.width,
+          height: content.height,
         },
       });
     }
@@ -107,12 +81,17 @@ export const Sticker = ({
     // Убеждаемся, что текст сохранен при выходе из редактирования
     if (onUpdate && text !== element.content?.text) {
       onUpdate({
-        ...element,
+        id: element.id,
+        x: element.x,
+        y: element.y,
+        scale: element.scale,
+        rotation: element.rotation,
+        zIndex: element.zIndex,
+        color: element.color,
         content: {
-          ...content,
           text: text,
-          width,
-          height,
+          width: content.width,
+          height: content.height,
         },
       });
     }
@@ -216,9 +195,18 @@ export const Sticker = ({
       const newY = (relativeY - translateY) / scale - dragStart.y;
 
       onUpdate({
-        ...element,
+        id: element.id,
         x: Math.max(0, newX),
         y: Math.max(0, newY),
+        scale: element.scale,
+        rotation: element.rotation,
+        zIndex: element.zIndex,
+        color: element.color,
+        content: {
+          text: element.content?.text ?? '',
+          width: element.content?.width,
+          height: element.content?.height,
+        },
       });
     };
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NeMiro.Application.DTOs;
@@ -78,20 +79,13 @@ public class BoardsService : IBoardsService
 
         var board = new Board
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = boardId,
             OwnerId = ownerId,
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = null,
         };
-        await _boardRepository.Create(
-            new Board
-            {
-                Id = Guid.NewGuid().ToString(),
-                OwnerId = ownerId,
-                CreatedAt = DateTimeOffset.UtcNow,
-                UpdatedAt = null,
-            },
-            cancellationToken);
+
+        await _boardRepository.Create(board, cancellationToken);
 
         return board;
     }
