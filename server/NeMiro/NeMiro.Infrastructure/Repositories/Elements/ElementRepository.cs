@@ -43,7 +43,7 @@ public class ElementRepository : IElementRepository
                 cancellationToken: cancellationToken));
     }
 
-    public async Task Delete(long id, CancellationToken cancellationToken = default)
+    public async Task Delete(string id, CancellationToken cancellationToken = default)
     {
         const string sql = "DELETE FROM elements WHERE id = @Id";
 
