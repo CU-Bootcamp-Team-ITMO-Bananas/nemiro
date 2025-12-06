@@ -9,6 +9,26 @@ namespace NeMiro.Infrastructure.Repositories.Users;
 
 public class UserRepository(NpgsqlDataSource dataSource) : IUserRepository
 {
+    public async Task<User?> GetUserAsync(long userId, CancellationToken cancellationToken)
+    {
+        const string sql = """
+                           SELECT *
+                           FROM users
+                           WHERE id = @Id
+                           """;
+
+        await using var connection = await dataSource.OpenConnectionAsync(cancellationToken);
+
+        return await connection.QueryFirstOrDefaultAsync<User>(
+            new CommandDefinition(
+                sql,
+                new
+                {
+                    Id = userId,
+                },
+                cancellationToken: cancellationToken));
+    }
+
     public async Task Create(User user, CancellationToken cancellationToken)
     {
         const string sql = """

@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using NeMiro.Application.Boards;
 using NeMiro.Application.DTOs;
+using NeMiro.Application.Users;
 
 namespace NeMiro.Presentation.Hubs;
 
@@ -10,13 +11,14 @@ using Microsoft.AspNetCore.SignalR;
 public class BoardHub : Hub
 {
     private readonly IBoardsService _boardService;
-
+    private readonly IUserService _userService;
     private readonly IHubContext<BoardHub> _hubContext;
 
-    public BoardHub(IBoardsService boardService, IHubContext<BoardHub> hubContext)
+    public BoardHub(IBoardsService boardService, IHubContext<BoardHub> hubContext, IUserService userService)
     {
         _boardService = boardService;
         _hubContext = hubContext;
+        _userService = userService;
     }
 
     public override async Task OnConnectedAsync()
@@ -39,6 +41,7 @@ public class BoardHub : Hub
 
         Context.Items["user_id"] = userId;
         Context.Items["board_id"] = boardId;
+        await _userService.JoinBoardUser(boardId, userId, cancellationToken);
 
         if (!string.IsNullOrEmpty(boardId))
         {
