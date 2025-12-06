@@ -5,7 +5,7 @@ namespace NeMiro.Models.Elements;
 
 public class Element
 {
-    public long Id { get; init; }
+    public required string Id { get; init; }
 
     public required string BoardId { get; init; }
 

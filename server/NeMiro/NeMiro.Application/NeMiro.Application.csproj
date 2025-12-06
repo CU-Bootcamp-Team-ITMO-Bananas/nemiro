@@ -4,7 +4,11 @@
     <ProjectReference Include="..\NeMiro.Models\NeMiro.Models.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" />
+    <PackageReference Include="AWSSDK.S3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="SixLabors.ImageSharp" />
+    <PackageReference Include="SixLabors.ImageSharp.Web" />
   </ItemGroup>
 </Project>
