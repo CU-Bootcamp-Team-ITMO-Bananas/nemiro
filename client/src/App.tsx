@@ -9,7 +9,6 @@ function App() {
 
   useEffect(() => {
     const initializeUser = async () => {
-      console.log(user);
       if (user == null) {
         const anonymous = anonymousUser();
         const newUser = await loginUser({

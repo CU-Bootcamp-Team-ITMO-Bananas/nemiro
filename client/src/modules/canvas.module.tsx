@@ -8,6 +8,8 @@ import { useBoardStore } from '@/shared/stores/board.store';
 import { findRenderer } from '@/shared/renderers/element-renderer.registry';
 import { useCallback, useEffect, useRef, Fragment, useState } from 'react';
 import { Stage, Layer } from 'react-konva';
+import { BoardElement } from '@/shared/interfaces/board/board-element.interface';
+import { ElementEvent } from '@/shared/interfaces/events/element-update-event.interface';
 
 export const Canvas = () => {
   const { board, updateBoard, updateElement, removeElement } = useBoardStore();
@@ -24,6 +26,11 @@ export const Canvas = () => {
     handleTouchMove,
     handleTouchEnd,
   } = useStageZoomPan();
+
+  const onUpdateElement = (element: BoardElement) => {
+    emit<ElementEvent>('UpdateElement', element);
+    updateElement(element);
+  };
 
   const lastEmitTime = useRef(0);
   const emitThrottleMs = 100;
@@ -106,7 +113,6 @@ export const Canvas = () => {
   }, [selectedElementId, removeElement]);
 
   const getUserById = (userId: number): User | null => {
-    console.log(board);
     return board?.users.find((u) => u.id == userId) ?? null;
   };
 
@@ -183,7 +189,7 @@ export const Canvas = () => {
         >
           {board?.elements
             .slice()
-            .sort((a, b) => a.zIndex - b.zIndex)
+            // .sort((a, b) => a.content.zIndex - b.zIndex)
             .map((element) => {
               const renderer = findRenderer(element);
               if (!renderer) {
@@ -200,7 +206,7 @@ export const Canvas = () => {
                       setSelectedElementId(element.id);
                     },
                     onUpdate: (updatedElement) => {
-                      updateElement(updatedElement);
+                      onUpdateElement(updatedElement);
                     },
                     onDelete: (elementId) => {
                       removeElement(elementId);
