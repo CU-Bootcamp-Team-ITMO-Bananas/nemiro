@@ -3,6 +3,7 @@ using NeMiro.Application.Auth;
 using NeMiro.Application.Boards;
 using NeMiro.Application.Pointers;
 using NeMiro.Application.Users;
+using NeMiro.Application.S3;
 
 namespace NeMiro.Application.Extensions;
 
@@ -13,6 +14,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IAuthService, AuthService>();
         services.AddSingleton<IBoardsService, BoardsService>();
         services.AddSingleton<IPointerService, PointerService>();
+        services.AddSingleton<IS3Service, S3Service>();
         services.AddSingleton<IUserService, UserService>();
         return services;
     }
