@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using NeMiro.Application.Boards;
 using NeMiro.Application.DTOs;
+using NeMiro.Application.Pointers;
 using NeMiro.Application.Users;
 
 namespace NeMiro.Presentation.Hubs;
@@ -12,13 +13,15 @@ public class BoardHub : Hub
 {
     private readonly IBoardsService _boardService;
     private readonly IUserService _userService;
+    private readonly IPointerService _pointerService;
     private readonly IHubContext<BoardHub> _hubContext;
 
-    public BoardHub(IBoardsService boardService, IHubContext<BoardHub> hubContext, IUserService userService)
+    public BoardHub(IBoardsService boardService, IHubContext<BoardHub> hubContext, IUserService userService, IPointerService pointerService)
     {
         _boardService = boardService;
         _hubContext = hubContext;
         _userService = userService;
+        _pointerService = pointerService;
     }
 
     public override async Task OnConnectedAsync()
@@ -67,6 +70,7 @@ public class BoardHub : Hub
         var userId = (long)Context.Items["user_id"]!;
         var boardId = Context.Items["board_id"] as string;
 
+        _pointerService.AddOrUpdatePointer(boardId, userId, pointer);
         var board = _boardService.GetBoardByIdAsync(boardId);
 
         await Clients.OthersInGroup($"board-{boardId}")
