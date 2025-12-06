@@ -26,11 +26,6 @@ public class BoardsService : IBoardsService
         _boardDictionary = new Dictionary<string, BoardDto>();
     }
 
-    public async Task<IEnumerable<Board>> GetBoards(long userId, CancellationToken cancellationToken)
-    {
-        return await _boardRepository.GetBoardsByUserId(userId, cancellationToken);
-    }
-
     public BoardDto GetBoardByIdAsync(string boardId)
     {
         var pointers = _pointerService.GetBoardPointers(boardId);
@@ -41,7 +36,7 @@ public class BoardsService : IBoardsService
 
     public async Task<string> CreateBoard(long userId, CancellationToken cancellationToken)
     {
-        var newBoard = new Board(Guid.NewGuid().ToString(), userId, DateTimeOffset.UtcNow, null);
+        var newBoard = new Board(Guid.NewGuid().ToString(), userId, DateTimeOffset.Now, null);
         await _boardRepository.Create(newBoard, cancellationToken);
         return newBoard.Id;
     }
@@ -56,7 +51,7 @@ public class BoardsService : IBoardsService
         var storedBoard = await _boardRepository.GetById(boardId, cancellationToken);
         if (storedBoard != null) return storedBoard;
 
-        var board = new Board(boardId, ownerId, DateTimeOffset.UtcNow, null);
+        var board = new Board(boardId, ownerId, DateTimeOffset.Now, null);
 
         await _boardRepository.Create(
             new Board(boardId, ownerId, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow),
