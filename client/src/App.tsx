@@ -9,6 +9,7 @@ function App() {
 
   useEffect(() => {
     const initializeUser = async () => {
+      console.log(user);
       if (user == null) {
         const anonymous = anonymousUser();
         const newUser = await loginUser({
@@ -19,6 +20,7 @@ function App() {
           auth_date: 0,
           hash: '',
         });
+        console.log(newUser);
         if (newUser != null) {
           setUser(newUser);
         }

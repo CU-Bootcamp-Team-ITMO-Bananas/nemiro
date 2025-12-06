@@ -13,12 +13,21 @@ using Microsoft.AspNetCore.SignalR;
 public class BoardHub : Hub
 {
     private readonly IBoardsService _boardService;
+
     private readonly IUserService _userService;
+
     private readonly IPointerService _pointerService;
+
     private readonly IElementService _elementService;
+
     private readonly IHubContext<BoardHub> _hubContext;
 
-    public BoardHub(IBoardsService boardService, IHubContext<BoardHub> hubContext, IUserService userService, IPointerService pointerService, IElementService elementService)
+    public BoardHub(
+        IBoardsService boardService,
+        IHubContext<BoardHub> hubContext,
+        IUserService userService,
+        IPointerService pointerService,
+        IElementService elementService)
     {
         _boardService = boardService;
         _hubContext = hubContext;
@@ -62,8 +71,10 @@ public class BoardHub : Hub
         var httpContext = Context.GetHttpContext();
         var cancellationToken = httpContext.RequestAborted;
         var boardId = httpContext.Request.Query["board_id"];
+        var userId = (long)Context.Items["user_id"]!;
 
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"board-{boardId}", cancellationToken);
+        _userService.DisconnectUserFromBoard(boardId!, userId);
 
         await base.OnDisconnectedAsync(exception);
     }

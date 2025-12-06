@@ -42,7 +42,7 @@ public class ElementService : IElementService
             boardId,
             new Dictionary<string, ElementDto>
             {
-                { element.Id, element }
+                { element.Id, element },
             });
     }
 

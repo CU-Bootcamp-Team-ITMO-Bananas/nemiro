@@ -25,18 +25,17 @@ public class BoardsService : IBoardsService
 
     private readonly IElementService _elementService;
 
-    public BoardsService(IBoardRepository boardRepository, IPointerService pointerService, IUserService userService, IElementService elementService)
+    public BoardsService(
+        IBoardRepository boardRepository,
+        IPointerService pointerService,
+        IUserService userService,
+        IElementService elementService)
     {
         _boardRepository = boardRepository;
         _pointerService = pointerService;
         _userService = userService;
         _elementService = elementService;
         _boardDictionary = new Dictionary<string, BoardDto>();
-    }
-
-    public async Task<IEnumerable<Board>> GetBoards(long userId, CancellationToken cancellationToken)
-    {
-        return await _boardRepository.GetBoardsByUserId(userId, cancellationToken);
     }
 
     public BoardDto GetBoardByIdAsync(string boardId)
@@ -70,6 +69,11 @@ public class BoardsService : IBoardsService
     public Task UpdateBoard(UpdateBoardRequest request, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<IEnumerable<Board>> GetBoards(long userId, CancellationToken cancellationToken)
+    {
+        return await _boardRepository.GetBoardsByUserId(userId, cancellationToken);
     }
 
     private async Task<Board> GetStoredOrCreateBoard(string boardId, long ownerId, CancellationToken cancellationToken)

@@ -15,6 +15,7 @@ export const HomePage = () => {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [boardId, setBoardId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const pathSegments = location.pathname.split('/');
   const urlBoardId = pathSegments[pathSegments.length - 1];

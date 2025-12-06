@@ -11,7 +11,9 @@ import { Stage, Layer } from 'react-konva';
 
 export const Canvas = () => {
   const { board, updateBoard, updateElement, removeElement } = useBoardStore();
-  const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
+  const [selectedElementId, setSelectedElementId] = useState<string | null>(
+    null
+  );
   const { subscribe, emit, connection } = useHub();
   const {
     stageRef,
@@ -103,8 +105,8 @@ export const Canvas = () => {
     };
   }, [selectedElementId, removeElement]);
 
-
   const getUserById = (userId: string): User | null => {
+    console.log(board);
     return board?.users.find((u) => u.id == userId) ?? null;
   };
 
@@ -112,8 +114,8 @@ export const Canvas = () => {
   const selectedElement = board?.elements.find(
     (el) => el.id === selectedElementId
   );
-  
-  const selectedElementRenderer = selectedElement 
+
+  const selectedElementRenderer = selectedElement
     ? findRenderer(selectedElement)
     : null;
 
@@ -124,15 +126,16 @@ export const Canvas = () => {
       style={{ touchAction: 'none' }}
     >
       {/* Боковая панель настроек */}
-      {selectedElement && selectedElementRenderer?.renderConfigPanel && board && (
+      {selectedElement &&
+        selectedElementRenderer?.renderConfigPanel &&
+        board &&
         selectedElementRenderer.renderConfigPanel({
           element: selectedElement,
           board,
           onUpdate: (updatedElement) => {
             updateElement(updatedElement);
           },
-        })
-      )}
+        })}
       <Stage
         ref={stageRef}
         width={window.innerWidth}
@@ -151,16 +154,22 @@ export const Canvas = () => {
           {board?.pointers?.map((pointer) => {
             const user = getUserById(pointer.userId);
             if (user) {
-              return <Pointer user={user} pointer={pointer} />;
+              return (
+                <Pointer
+                  key={`user_pointer_${pointer.userId}`}
+                  user={user}
+                  pointer={pointer}
+                />
+              );
             }
           })}
         </Layer>
       </Stage>
 
       <div className='absolute inset-0 pointer-events-none overflow-hidden'>
-        <div 
-          className='relative w-full h-full' 
-          style={{ 
+        <div
+          className='relative w-full h-full'
+          style={{
             pointerEvents: 'auto',
             transform: `translate(${stagePos.x}px, ${stagePos.y}px) scale(${stageScale})`,
             transformOrigin: '0 0',
