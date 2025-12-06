@@ -21,7 +21,7 @@ export const AvailableBoards : React.FC<AvailableBoardsProps> = ({setIsModalOpen
       const fetchBoards = async () => {
         const boards = await getBoards();
         if (boards) {
-          setBoards(boards);
+          setBoards(boards.map((board) => board.id));
         }
       };
       fetchBoards();
