@@ -23,27 +23,18 @@ export const Header = ({
       <Logo />
       <AvailableBoardsButton />
       <div className='flex items-center gap-5'>
-        <LoadingSpinner />
-        {isLoggedIn ? (
-          <div className='*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale'>
-            <People />
-            <Avatar>
-              <AvatarImage
-                src={user?.avatar ?? ''}
-                alt={user?.username ?? ''}
-              />
-              <AvatarFallback>
-                {user?.username?.toUpperCase()[0]}
-              </AvatarFallback>
-            </Avatar>
-            <ShareButton
-              isOpen={isShareModalOpen}
-              setIsOpen={setIsShareModalOpen}
-            />
-          </div>
-        ) : (
-          <Login />
-        )}
+        <div className='*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale'>
+          <People />
+          <Avatar>
+            <AvatarImage src={user?.avatar ?? ''} alt={user?.username ?? ''} />
+            <AvatarFallback>{user?.username?.toUpperCase()[0]}</AvatarFallback>
+          </Avatar>
+        </div>
+        {!isLoggedIn && <Login />}
+        <ShareButton
+          isOpen={isShareModalOpen}
+          setIsOpen={setIsShareModalOpen}
+        />
       </div>
     </div>
   );
