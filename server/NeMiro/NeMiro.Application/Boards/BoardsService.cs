@@ -41,7 +41,7 @@ public class BoardsService : IBoardsService
 
     public async Task<string> CreateBoard(long userId, CancellationToken cancellationToken)
     {
-        var newBoard = new Board(Guid.NewGuid().ToString(), userId, DateTimeOffset.Now, null);
+        var newBoard = new Board(Guid.NewGuid().ToString(), userId, DateTimeOffset.UtcNow, null);
         await _boardRepository.Create(newBoard, cancellationToken);
         return newBoard.Id;
     }
@@ -56,7 +56,7 @@ public class BoardsService : IBoardsService
         var storedBoard = await _boardRepository.GetById(boardId, cancellationToken);
         if (storedBoard != null) return storedBoard;
 
-        var board = new Board(boardId, ownerId, DateTimeOffset.Now, null);
+        var board = new Board(boardId, ownerId, DateTimeOffset.UtcNow, null);
 
         await _boardRepository.Create(
             new Board(boardId, ownerId, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow),
