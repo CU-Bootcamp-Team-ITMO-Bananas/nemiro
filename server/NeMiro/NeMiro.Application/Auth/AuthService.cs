@@ -21,12 +21,10 @@ public class AuthService(IUserRepository userRepository) : IAuthService
         {
             Username = request.UserName,
             Avatar = request.PhotoUrl,
-            Telegram = request.Id,
-            Id = request.Id,
         };
+        var id = await userRepository.Create(newUser, cancellationToken);
 
-        await userRepository.Create(newUser, cancellationToken);
-
+        newUser.Id = id;
         return newUser;
     }
 }

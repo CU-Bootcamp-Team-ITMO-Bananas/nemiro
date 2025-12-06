@@ -7,6 +7,4 @@ public class User
     public required string Username { get; set; }
 
     public string? Avatar { get; set; }
-
-    public required long Telegram { get; set; }
 }

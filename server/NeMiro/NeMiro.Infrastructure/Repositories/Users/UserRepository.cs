@@ -32,8 +32,8 @@ public class UserRepository(NpgsqlDataSource dataSource) : IUserRepository
     public async Task<long> Create(User user, CancellationToken cancellationToken)
     {
         const string sql = """
-                           INSERT INTO users (telegram, username, created_at, avatar)
-                           VALUES (@Telegram, @Username, @CreatedAt, @Avatar)
+                           INSERT INTO users (username, created_at, avatar)
+                           VALUES (@Username, @CreatedAt, @Avatar)
                            RETURNING id
                            """;
 
@@ -41,7 +41,6 @@ public class UserRepository(NpgsqlDataSource dataSource) : IUserRepository
 
         var parameters = new
         {
-            Telegram = user.Telegram,
             Username = user.Username,
             CreatedAt = DateTimeOffset.UtcNow,
             Avatar = user.Avatar,
