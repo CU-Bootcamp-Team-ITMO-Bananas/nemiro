@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NeMiro.Application.Extensions;
 using NeMiro.Infrastructure.Extensions;
+using NeMiro.Presentation.Hubs;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -44,5 +45,6 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.MapControllers();
+app.MapHub<BoardHub>("/hubs/board");
 
 await app.RunAsync();
