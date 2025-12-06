@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.SignalR;
 public class BoardHub : Hub
 {
     private readonly IBoardsService _boardService;
+
     private readonly IHubContext<BoardHub> _hubContext;
 
     public BoardHub(IBoardsService boardService, IHubContext<BoardHub> hubContext)
@@ -72,7 +73,7 @@ public class BoardHub : Hub
             UserId = userId
         };
 
-        await Clients.All
+        await Clients.OthersInGroup($"board-{boardId}")
             .SendAsync(
                 "BoardUpdate",
                 new BoardDto

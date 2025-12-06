@@ -1,14 +1,13 @@
-// components/Canvas/index.tsx
 import { useHub } from '@/shared/context/hub.context';
 import { useStageZoomPan } from '@/shared/hooks/useStageZoomPan';
 import { Board } from '@/shared/interfaces/board/board.interface';
 import { PointerUpdateEvent } from '@/shared/interfaces/events/pointer-update-event.interface';
 import { useBoardStore } from '@/shared/stores/board.store';
 import { useCallback, useEffect, useRef } from 'react';
-import { Stage, Layer, Rect, Circle } from 'react-konva';
+import { Stage, Layer, Rect, Circle, Group } from 'react-konva';
 
 export const Canvas = () => {
-  const { updateBoard } = useBoardStore();
+  const { board, updateBoard } = useBoardStore();
   const { subscribe, emit, connection } = useHub();
   const {
     stageRef,
@@ -29,10 +28,33 @@ export const Canvas = () => {
       if (now - lastEmitTime.current > emitThrottleMs) {
         lastEmitTime.current = now;
         const { clientX, clientY } = event;
-        emit<PointerUpdateEvent>('UpdatePointer', { x: clientX, y: clientY });
+
+        // Get the stage container's position relative to the viewport
+        const stage = stageRef.current;
+        if (stage) {
+          const container = stage.container();
+          const rect = container.getBoundingClientRect();
+
+          // Convert window coordinates to stage coordinates
+          // 1. First, get position relative to the container
+          const containerX = clientX - rect.left;
+          const containerY = clientY - rect.top;
+
+          // 2. Then, convert to stage coordinates (accounting for pan and zoom)
+          const stageX = (containerX - stage.x()) / stage.scaleX();
+          const stageY = (containerY - stage.y()) / stage.scaleY();
+
+          emit<PointerUpdateEvent>('UpdatePointer', {
+            x: stageX,
+            y: stageY,
+          });
+        } else {
+          // Fallback to window coordinates if stage not available
+          emit<PointerUpdateEvent>('UpdatePointer', { x: clientX, y: clientY });
+        }
       }
     },
-    [emit]
+    [emit, stageRef]
   );
 
   useEffect(() => {
@@ -48,6 +70,20 @@ export const Canvas = () => {
       abortController.abort();
     };
   }, [connection, subscribe, updateBoard]);
+
+  const getUserColor = (userId: number): string => {
+    const colors = [
+      '#FF6B6B', // Red
+      '#4ECDC4', // Teal
+      '#FFD166', // Yellow
+      '#06D6A0', // Green
+      '#118AB2', // Blue
+      '#EF476F', // Pink
+      '#073B4C', // Dark Blue
+      '#7209B7', // Purple
+    ];
+    return colors[userId % colors.length];
+  };
 
   return (
     <div
@@ -70,15 +106,40 @@ export const Canvas = () => {
         scaleY={stageScale}
       >
         <Layer>
-          <Rect
-            x={20}
-            y={50}
-            width={100}
-            height={100}
-            fill='red'
-            shadowBlur={10}
-            draggable
-          />
+          {board?.pointers?.map((pointer) => {
+            const color = getUserColor(pointer.userId);
+
+            return (
+              <Group
+                key={`pointer-${pointer.userId}`}
+                x={pointer.x}
+                y={pointer.y}
+              >
+                {/* Pointer circle */}
+                <Circle
+                  radius={20}
+                  fill={color}
+                  opacity={0.8}
+                  stroke='white'
+                  strokeWidth={2}
+                  shadowColor='black'
+                  shadowBlur={5}
+                  shadowOpacity={0.3}
+                />
+
+                {/* Pointer trail (optional visual effect) */}
+                <Circle
+                  radius={25}
+                  fill={color}
+                  opacity={0.3}
+                  listening={false}
+                />
+              </Group>
+            );
+          })}
+        </Layer>
+        <Layer>
+          <Rect x={20} y={50} width={100} height={100} fill='red' draggable />
           <Circle x={200} y={100} radius={50} fill='green' draggable />
         </Layer>
       </Stage>
