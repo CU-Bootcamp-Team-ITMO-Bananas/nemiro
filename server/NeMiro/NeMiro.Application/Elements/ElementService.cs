@@ -40,9 +40,9 @@ public class ElementService : IElementService
 
         _elements.Add(
             boardId,
-            new Dictionary<string, ElementDto>(
+            new Dictionary<string, ElementDto>
             {
-                { element.Id, element }
+                { element.Id, element },
             });
     }
 
