@@ -30,6 +30,24 @@ export const Canvas = () => {
     handleTouchEnd,
   } = useStageZoomPan();
 
+  const [size, setSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  useEffect(() => {
+    const checkSize = () => {
+      setSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', checkSize);
+
+    return () => window.removeEventListener('resize', checkSize);
+  }, []);
+
   const transformerRef = useRef<Konva.Transformer>(null);
 
   useEffect(() => {
@@ -57,9 +75,6 @@ export const Canvas = () => {
     emit<ElementEvent>('DeleteElement', element);
     removeElement(element.id);
   };
-
-  const lastEmitTime = useRef(0);
-  const emitThrottleMs = 100;
 
   const handleMouseMove = useCallback(
     (event: React.MouseEvent) => {
@@ -158,8 +173,8 @@ export const Canvas = () => {
 
       <Stage
         ref={stageRef}
-        width={window.innerWidth}
-        height={window.innerHeight}
+        width={size.width}
+        height={size.height}
         draggable
         onWheel={handleWheel}
         onTouchStart={handleTouchStart}

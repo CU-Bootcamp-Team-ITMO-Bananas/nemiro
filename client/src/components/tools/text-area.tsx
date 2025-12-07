@@ -15,10 +15,11 @@ export const TextArea = ({ textNode, onChange, onClose }: TextAreaProps) => {
     if (!textareaRef.current) return;
     const textarea = textareaRef.current;
 
+    const stagePositon = textNode.getStage()?.getPosition();
     const textPosition = textNode.getAbsolutePosition();
     const areaPosition = {
-      x: textPosition.x,
-      y: textPosition.y,
+      x: textPosition.x - stagePositon!.x,
+      y: textPosition.y - stagePositon!.y,
     };
 
     // Match styles with the text node
