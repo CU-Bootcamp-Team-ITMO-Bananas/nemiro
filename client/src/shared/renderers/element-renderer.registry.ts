@@ -1,6 +1,7 @@
 import { BoardElement } from '../interfaces/board/board-element.interface';
 import { ElementRenderer } from './element-renderer.interface';
 import { stickerRenderer } from './sticker.renderer';
+import { imageRenderer } from './image.renderer';
 
 /**
  * Регистр всех рендереров элементов
@@ -8,6 +9,7 @@ import { stickerRenderer } from './sticker.renderer';
  */
 const renderers: ElementRenderer[] = [
   stickerRenderer,
+  imageRenderer,
   // Здесь можно добавить другие рендереры:
   // shapeRenderer,
   // textRenderer,
@@ -28,4 +30,3 @@ export const findRenderer = (element: BoardElement): ElementRenderer | null => {
 export const registerRenderer = (renderer: ElementRenderer) => {
   renderers.push(renderer);
 };
-

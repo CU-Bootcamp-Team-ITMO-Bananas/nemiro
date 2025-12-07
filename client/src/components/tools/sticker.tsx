@@ -1,6 +1,6 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
-import { Group, Rect, Text } from 'react-konva';
 import Konva from 'konva';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { Group, Rect, Text, Transformer } from 'react-konva';
 import { StickerElement } from '@/shared/interfaces/board/tools/sticker-element.interface';
 import { STICKER_COLORS } from './sticker-config-menu';
 import { TextEditor } from './text-editor';
@@ -129,7 +129,11 @@ export const Sticker = ({
           y={12}
           width={width - 24}
           height={height - 24}
-          text={isEditing || text != '' ? text : 'Кликните дважды для редактирования'}
+          text={
+            isEditing || text != ''
+              ? text
+              : 'Кликните дважды для редактирования'
+          }
           fill={text ? '#1f2937' : '#6b7280'}
           fontSize={fontSize}
           fontStyle={!text ? 'italic' : 'normal'}

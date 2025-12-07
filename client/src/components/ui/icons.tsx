@@ -1,3 +1,5 @@
+import { cn } from '@/lib/utils';
+
 export const Icons = {
   Telegram: () => (
     <svg
@@ -37,19 +39,34 @@ export const Icons = {
       <path d='M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z' />
     </svg>
   ),
-  NewDocument: () => (
+  NewDocument: ({ className }: { className?: string }) => (
     <svg
       xmlns='http://www.w3.org/2000/svg'
       fill='none'
       viewBox='0 0 24 24'
-      strokeWidth={2}
       stroke='currentColor'
-      className='size-4'
+      className={cn('text-white', className)}
     >
       <path
         strokeLinecap='round'
         strokeLinejoin='round'
         d='M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z'
+      />
+    </svg>
+  ),
+  Sticker: ({ className }: { className?: string }) => (
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      width='20'
+      height='20'
+      viewBox='0 0 24 24'
+      fill='currentColor'
+      className={cn('text-white', className)}
+    >
+      <path
+        fillRule='evenodd'
+        clipRule='evenodd'
+        d='M5 2a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h7c5.523 0 10-4.477 10-10V5a3 3 0 0 0-3-3H5Zm15 7V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1v-.004h4a3 3 0 0 0 3-3V13l1-1h4a3 3 0 0 0 3-3Zm-6.952 10.932A4.977 4.977 0 0 0 14 16.996V14h3a4.977 4.977 0 0 0 2.932-.95 8.004 8.004 0 0 1-6.884 6.882Z'
       />
     </svg>
   ),

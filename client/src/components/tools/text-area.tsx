@@ -16,10 +16,12 @@ export const TextArea = ({ textNode, onChange, onClose }: TextAreaProps) => {
     const textarea = textareaRef.current;
 
     const stagePositon = textNode.getStage()?.getPosition();
+    const stageScale = textNode.getStage()?.getAbsoluteScale();
+
     const textPosition = textNode.getAbsolutePosition();
     const areaPosition = {
-      x: textPosition.x - stagePositon!.x,
-      y: textPosition.y - stagePositon!.y,
+      x: (textPosition.x - stagePositon!.x) / stageScale!.x,
+      y: (textPosition.y - stagePositon!.y) / stageScale!.y,
     };
 
     // Match styles with the text node
