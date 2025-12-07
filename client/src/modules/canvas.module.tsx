@@ -204,11 +204,13 @@ export const Canvas = () => {
             const user = getUserById(pointer.userId);
             if (user && user.id != localUser!.id) {
               return (
-                <Pointer
-                  key={`user_pointer_${pointer.userId}`}
-                  user={user}
-                  pointer={pointer}
-                />
+                <Fragment key={`user_pointer_${pointer.userId}`}>
+                  <Pointer
+                    key={`user_pointer_${pointer.userId}`}
+                    user={user}
+                    pointer={pointer}
+                  />
+                </Fragment>
               );
             }
           })}

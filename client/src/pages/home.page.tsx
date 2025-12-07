@@ -6,6 +6,7 @@ import { createBoard, getBoards } from '@/shared/api/boards.api';
 import { HubContextProvider } from '@/shared/context/hub.context';
 import { useAuthStore } from '@/shared/stores/auth.store';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { LoadingSpinner } from '@/components/header/loading-spinner';
 
 export const HomePage = () => {
   const { user } = useAuthStore();
@@ -16,10 +17,10 @@ export const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
-  const pathSegments = location.pathname.split('/');
-  const urlBoardId = pathSegments[pathSegments.length - 1];
-
   useEffect(() => {
+    const pathSegments = location.pathname.split('/');
+    const urlBoardId = pathSegments[pathSegments.length - 1];
+
     const initializeBoard = async () => {
       if (!user) {
         setIsLoading(false);
@@ -48,18 +49,18 @@ export const HomePage = () => {
     };
 
     initializeBoard();
-  }, [user, urlBoardId, navigate]);
+  }, [user, location, navigate]);
 
   if (!user || isLoading) {
     return (
       <div className='flex items-center justify-center h-screen'>
-        <div className='text-lg'>Loading board...</div>
+        Загружаем доску... <LoadingSpinner />
       </div>
     );
   }
 
   return (
-    <HubContextProvider boardId={boardId || urlBoardId} userId={user.id}>
+    <HubContextProvider key={boardId} boardId={boardId!} userId={user.id}>
       <Header
         isShareModalOpen={isShareModalOpen}
         setIsShareModalOpen={setIsShareModalOpen}

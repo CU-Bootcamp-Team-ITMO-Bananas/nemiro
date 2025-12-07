@@ -4,6 +4,7 @@ import { Login } from '@/components/header/login-button';
 import { Logo } from '@/components/header/logo';
 import { ShareButton } from '@/components/header/share-button';
 import { People } from '@/components/header/people';
+import { NewBoardButton } from '@/components/header/new-document-button';
 
 interface HeaderProps {
   isShareModalOpen: boolean;
@@ -21,18 +22,13 @@ export const Header = ({
       <Logo />
       {/* <AvailableBoardsButton /> */}
       <div className='flex items-center gap-5'>
-        <div className='*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale'>
-          <People />
-          <Avatar>
-            <AvatarImage src={user?.avatar ?? ''} alt={user?.username ?? ''} />
-            <AvatarFallback>{user?.username?.toUpperCase()[0]}</AvatarFallback>
-          </Avatar>
-        </div>
         {!isLoggedIn && <Login />}
+        <People />
         <ShareButton
           isOpen={isShareModalOpen}
           setIsOpen={setIsShareModalOpen}
         />
+        <NewBoardButton />
       </div>
     </div>
   );

@@ -25,8 +25,7 @@ export const anonymousUser = (): User => {
       length: 2,
       separator: ' ',
     }),
-    avatar:
-      'https://www.notion.com/_next/image?url=https%3A%2F%2Fimages.ctfassets.net%2Fspoqsaf9291f%2F12aGR6AxxXEWa7lyx2ajKf%2Ff975bec7ca7eaf17cc0a856daa55897f%2FNPC_10_priority.webp&w=1080&q=75',
+    avatar: null,
     telegram: 0,
   };
 };

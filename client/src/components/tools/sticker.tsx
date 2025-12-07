@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Group, Rect, Text } from 'react-konva';
 import Konva from 'konva';
 import { StickerElement } from '@/shared/interfaces/board/tools/sticker-element.interface';
 import { STICKER_COLORS } from './sticker-config-menu';
+import { TextEditor } from './text-editor';
 
 interface StickerProps {
   element: StickerElement;
@@ -21,39 +22,22 @@ export const Sticker = ({
   stageScale = 1,
 }: StickerProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [text, setText] = useState<string>(element.content?.text || '');
-  const [tempText, setTempText] = useState<string>(element.content?.text || '');
-
   const groupRef = useRef<Konva.Group>(null);
   const textNodeRef = useRef<Konva.Text>(null);
 
   const content = element.content || { text: '' };
   const width = content.width ?? 200;
   const height = content.height ?? 200;
-  const colorIndex = element.content.color ?? 0;
+  const colorIndex = element.content?.color ?? 0;
   const backgroundColor = STICKER_COLORS[colorIndex % STICKER_COLORS.length];
   const fontSize = Math.max(14, 14 / stageScale);
-
-  // Синхронизация текста с элементом
-  useEffect(() => {
-    if (element.content?.text !== undefined) {
-      setText(element.content.text);
-      setTempText(element.content.text);
-    }
-  }, [element.content?.text]);
-
-  // Автоматический размер текста
-  useEffect(() => {
-    if (textNodeRef.current && !isEditing) {
-      textNodeRef.current.width(width - 24); // Отступы по 12px с каждой стороны
-    }
-  }, [width, isEditing, text]);
+  const text = content.text || '';
 
   const handleTextChange = useCallback(
     (newText: string) => {
       if (onUpdate) {
         onUpdate({
-          id: element.id,
+          ...element,
           content: {
             ...content,
             text: newText,
@@ -61,7 +45,7 @@ export const Sticker = ({
         });
       }
     },
-    [onUpdate, element.id, content]
+    [onUpdate, element, content]
   );
 
   const handleDrag = useCallback(
@@ -70,7 +54,7 @@ export const Sticker = ({
 
       const node = e.target;
       onUpdate({
-        id: element.id,
+        ...element,
         content: {
           ...content,
           x: node.x(),
@@ -78,7 +62,7 @@ export const Sticker = ({
         },
       });
     },
-    [onUpdate, element.id, content]
+    [onUpdate, element, content]
   );
 
   const handleClick = useCallback(
@@ -100,30 +84,13 @@ export const Sticker = ({
     []
   );
 
-  const handleBlur = useCallback(() => {
+  const handleCloseEditor = useCallback(() => {
     setIsEditing(false);
-    if (tempText !== text) {
-      handleTextChange(tempText);
-    }
-  }, [tempText, text, handleTextChange]);
+  }, []);
 
-  // Обработка нажатий клавиш в режиме редактирования
   useEffect(() => {
-    if (!isEditing) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setTempText(text);
-        setIsEditing(false);
-      } else if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        handleBlur();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isEditing, text, handleBlur]);
+    if (isSelected == false) setIsEditing(false);
+  }, [isSelected]);
 
   return (
     <>
@@ -136,7 +103,7 @@ export const Sticker = ({
         rotation={content.rotation || 0}
         scaleX={content.scale || 1}
         scaleY={content.scale || 1}
-        draggable
+        draggable={!isEditing}
         onClick={handleClick}
         onDblClick={handleDblClick}
         onDragMove={handleDrag}
@@ -156,65 +123,33 @@ export const Sticker = ({
         />
 
         {/* Текст стикера */}
-        {isEditing ? (
-          // Поле ввода для редактирования
-          <Rect
-            width={width - 24}
-            height={height - 24}
-            x={12}
-            y={12}
-            fill='transparent'
-          />
-        ) : (
-          <Text
-            ref={textNodeRef}
-            x={12}
-            y={12}
-            width={width - 24}
-            height={height - 24}
-            text={text || 'Дважды кликните для редактирования'}
-            fill={text ? '#1f2937' : '#6b7280'}
-            fontSize={fontSize}
-            fontStyle={!text ? 'italic' : 'normal'}
-            fontFamily='Inter, system-ui, sans-serif'
-            fontWeight='500'
-            align='center'
-            verticalAlign='middle'
-            wrap='word'
-            lineHeight={1.4}
-            padding={8}
-          />
-        )}
+        <Text
+          ref={textNodeRef}
+          x={12}
+          y={12}
+          width={width - 24}
+          height={height - 24}
+          text={isEditing || text != '' ? text : 'Кликните дважды для редактирования'}
+          fill={text ? '#1f2937' : '#6b7280'}
+          fontSize={fontSize}
+          fontStyle={!text ? 'italic' : 'normal'}
+          fontFamily='Inter, system-ui, sans-serif'
+          fontWeight='500'
+          align='center'
+          wrap='word'
+          lineHeight={1.4}
+          padding={8}
+          visible={!isEditing}
+        />
       </Group>
 
-      {/* Скрытый textarea для редактирования текста */}
-      {isEditing && (
-        <textarea
-          value={tempText}
-          onChange={(e) => setTempText(e.target.value)}
-          onBlur={handleBlur}
-          autoFocus
-          style={{
-            position: 'absolute',
-            left: `${content.x * stageScale + 12 * stageScale}px`,
-            top: `${content.y * stageScale + 12 * stageScale}px`,
-            width: `${(width - 24) * stageScale}px`,
-            height: `${(height - 24) * stageScale}px`,
-            fontSize: `${fontSize * stageScale}px`,
-            lineHeight: 1.4,
-            padding: `${8 * stageScale}px`,
-            fontFamily: 'Inter, system-ui, sans-serif',
-            fontWeight: 500,
-            textAlign: 'center',
-            backgroundColor: 'transparent',
-            border: '1px solid #3b82f6',
-            borderRadius: '4px',
-            outline: 'none',
-            resize: 'none',
-            zIndex: 9999,
-            transformOrigin: 'top left',
-            transform: `scale(${1 / stageScale})`,
-          }}
+      {/* Text Editor для редактирования */}
+      {isEditing && textNodeRef.current && (
+        <TextEditor
+          textNode={textNodeRef.current}
+          onChange={handleTextChange}
+          onClose={handleCloseEditor}
+          stageScale={stageScale}
         />
       )}
     </>
