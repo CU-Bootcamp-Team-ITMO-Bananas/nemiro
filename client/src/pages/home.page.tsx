@@ -54,7 +54,8 @@ export const HomePage = () => {
   if (!user || isLoading) {
     return (
       <div className='flex items-center justify-center h-screen'>
-        Загружаем доску... <LoadingSpinner />
+        <p className='pr-3'>Загружаем доску...</p>
+        <LoadingSpinner />
       </div>
     );
   }
