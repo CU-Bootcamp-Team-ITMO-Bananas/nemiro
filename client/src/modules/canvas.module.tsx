@@ -7,7 +7,7 @@ import { User } from '@/shared/interfaces/user.interface';
 import { useBoardStore } from '@/shared/stores/board.store';
 import { findRenderer } from '@/shared/renderers/element-renderer.registry';
 import { useCallback, useEffect, useRef, Fragment, useState } from 'react';
-import { Stage, Layer, Transformer } from 'react-konva';
+import { Stage, Layer } from 'react-konva';
 import { BoardElement } from '@/shared/interfaces/board/board-element.interface';
 import { ElementEvent } from '@/shared/interfaces/events/element-update-event.interface';
 import { useAuthStore } from '@/shared/stores/auth.store';

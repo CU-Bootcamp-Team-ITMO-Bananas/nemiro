@@ -27,24 +27,24 @@ export const HomePage = () => {
         return;
       }
 
-      try {
-        if (urlBoardId && urlBoardId !== '') {
-          setBoardId(urlBoardId);
-        } else {
-          const oldBoards = await getBoards();
-          if (oldBoards != null && oldBoards.length > 0) {
-            navigate(`/${oldBoards[0].id}`, { replace: true });
-          }
-
-          const newBoard = await createBoard();
-          if (newBoard !== null && newBoard !== '') {
-            navigate(`/${newBoard}`, { replace: true });
-          }
-        }
-      } catch (error) {
-        console.error('Error initializing board:', error);
-      } finally {
+      if (urlBoardId && urlBoardId !== '') {
+        setBoardId(urlBoardId);
         setIsLoading(false);
+        return;
+      } else {
+        const oldBoards = await getBoards();
+        if (oldBoards != null && oldBoards.length > 0) {
+          navigate(`/${oldBoards[0].id}`, { replace: true });
+          setIsLoading(false);
+          return;
+        }
+
+        const newBoard = await createBoard();
+        if (newBoard !== null && newBoard !== '') {
+          navigate(`/${newBoard}`, { replace: true });
+          setIsLoading(false);
+          return;
+        }
       }
     };
 
