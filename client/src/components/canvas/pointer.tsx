@@ -13,7 +13,7 @@ interface PointerProps {
 export const Pointer = ({ pointer, user }: PointerProps) => {
   const color = getUserColor(user.id);
 
-  const [image] = useImage(user.avatar ?? '', 'anonymous');
+  const [image] = useImage(user.avatar ?? '');
   const [cursor] = useImage(
     generateColoredCursorSVG(color, user.id),
     'anonymous'
