@@ -1,4 +1,5 @@
 import { useLocation } from 'react-router-dom';
+import { Icons } from '../ui/icons';
 
 interface ShareButtonProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ export const ShareButton = ({ isOpen, setIsOpen }: ShareButtonProps) => {
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(currentUrl);
+      setIsOpen(false);
       // Можно добавить уведомление об успешном копировании
     } catch (err) {
       console.error('Failed to copy:', err);
@@ -25,20 +27,12 @@ export const ShareButton = ({ isOpen, setIsOpen }: ShareButtonProps) => {
         className='px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors'
         aria-label='Поделиться'
       >
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          width='20'
-          height='20'
-          fill='currentColor'
-          viewBox='0 0 16 16'
-        >
-          <path d='M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5m-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3' />
-        </svg>
+        <Icons.Share />
       </button>
 
       {isOpen && (
         <div
-          className='fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[1000]'
+          className='fixed inset-0 backdrop-blur-sm flex items-center justify-center z-[1000]'
           onClick={() => setIsOpen(false)}
         >
           <div
@@ -51,18 +45,10 @@ export const ShareButton = ({ isOpen, setIsOpen }: ShareButtonProps) => {
               </h3>
               <button
                 onClick={() => setIsOpen(false)}
-                className='p-1 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'
+                className='p-1 bg-white'
                 aria-label='Закрыть'
               >
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  width='20'
-                  height='20'
-                  fill='currentColor'
-                  viewBox='0 0 16 16'
-                >
-                  <path d='M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z' />
-                </svg>
+                <Icons.Close />
               </button>
             </div>
             <div className='mt-4'>

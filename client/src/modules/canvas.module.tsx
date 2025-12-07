@@ -7,11 +7,14 @@ import { User } from '@/shared/interfaces/user.interface';
 import { useBoardStore } from '@/shared/stores/board.store';
 import { findRenderer } from '@/shared/renderers/element-renderer.registry';
 import { useCallback, useEffect, useRef, Fragment, useState } from 'react';
-import { Stage, Layer } from 'react-konva';
+import { Stage, Layer, Transformer } from 'react-konva';
 import { BoardElement } from '@/shared/interfaces/board/board-element.interface';
 import { ElementEvent } from '@/shared/interfaces/events/element-update-event.interface';
+import { useAuthStore } from '@/shared/stores/auth.store';
+import Konva from 'konva';
 
 export const Canvas = () => {
+  const { user: localUser } = useAuthStore();
   const { board, updateBoard, updateElement, removeElement } = useBoardStore();
   const [selectedElementId, setSelectedElementId] = useState<string | null>(
     null
@@ -26,6 +29,24 @@ export const Canvas = () => {
     handleTouchMove,
     handleTouchEnd,
   } = useStageZoomPan();
+
+  const transformerRef = useRef<Konva.Transformer>(null);
+
+  useEffect(() => {
+    if (transformerRef.current) {
+      transformerRef.current.nodes([]);
+      transformerRef.current.getLayer()?.batchDraw();
+    }
+  }, [selectedElementId]);
+
+  const handleStageClick = useCallback(
+    (e: Konva.KonvaEventObject<MouseEvent>) => {
+      if (e.target === e.target.getStage()) {
+        setSelectedElementId(null);
+      }
+    },
+    []
+  );
 
   const onUpdateElement = (element: BoardElement) => {
     emit<ElementEvent>('UpdateElement', element);
@@ -42,34 +63,25 @@ export const Canvas = () => {
 
   const handleMouseMove = useCallback(
     (event: React.MouseEvent) => {
-      const now = Date.now();
-      if (now - lastEmitTime.current > emitThrottleMs) {
-        lastEmitTime.current = now;
-        const { clientX, clientY } = event;
+      const { clientX, clientY } = event;
 
-        // Get the stage container's position relative to the viewport
-        const stage = stageRef.current;
-        if (stage) {
-          const container = stage.container();
-          const rect = container.getBoundingClientRect();
+      const stage = stageRef.current;
+      if (stage) {
+        const container = stage.container();
+        const rect = container.getBoundingClientRect();
 
-          // Convert window coordinates to stage coordinates
-          // 1. First, get position relative to the container
-          const containerX = clientX - rect.left;
-          const containerY = clientY - rect.top;
+        const containerX = clientX - rect.left;
+        const containerY = clientY - rect.top;
 
-          // 2. Then, convert to stage coordinates (accounting for pan and zoom)
-          const stageX = (containerX - stage.x()) / stage.scaleX();
-          const stageY = (containerY - stage.y()) / stage.scaleY();
+        const stageX = (containerX - stage.x()) / stage.scaleX();
+        const stageY = (containerY - stage.y()) / stage.scaleY();
 
-          emit<PointerUpdateEvent>('UpdatePointer', {
-            x: stageX,
-            y: stageY,
-          });
-        } else {
-          // Fallback to window coordinates if stage not available
-          emit<PointerUpdateEvent>('UpdatePointer', { x: clientX, y: clientY });
-        }
+        emit<PointerUpdateEvent>('UpdatePointer', {
+          x: stageX,
+          y: stageY,
+        });
+      } else {
+        emit<PointerUpdateEvent>('UpdatePointer', { x: clientX, y: clientY });
       }
     },
     [emit, stageRef]
@@ -89,15 +101,12 @@ export const Canvas = () => {
     };
   }, [connection, subscribe, updateBoard]);
 
-  // Находим выбранный элемент и его renderer
   const selectedElement = board?.elements.find(
     (el) => el.id === selectedElementId
   );
 
-  // Обработка удаления выбранного элемента по Backspace
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Проверяем, что фокус не в input/textarea
       const activeElement = document.activeElement;
       if (
         activeElement &&
@@ -136,7 +145,6 @@ export const Canvas = () => {
       className='relative w-full h-screen'
       style={{ touchAction: 'none' }}
     >
-      {/* Боковая панель настроек */}
       {selectedElement &&
         selectedElementRenderer?.renderConfigPanel &&
         board &&
@@ -144,9 +152,10 @@ export const Canvas = () => {
           element: selectedElement,
           board,
           onUpdate: (updatedElement) => {
-            updateElement(updatedElement);
+            onUpdateElement(updatedElement);
           },
         })}
+
       <Stage
         ref={stageRef}
         width={window.innerWidth}
@@ -156,15 +165,44 @@ export const Canvas = () => {
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        onClick={handleStageClick}
         x={stagePos.x}
         y={stagePos.y}
         scaleX={stageScale}
         scaleY={stageScale}
       >
         <Layer>
+          {board?.elements.slice().map((element) => {
+            const renderer = findRenderer(element);
+            if (!renderer) {
+              console.warn(`No renderer found for element: ${element.id}`);
+              return null;
+            }
+
+            return (
+              <Fragment key={element.id}>
+                {renderer.render({
+                  element,
+                  isSelected: selectedElementId === element.id,
+                  onSelect: () => {
+                    onUpdateElement(element);
+                    setSelectedElementId(element.id);
+                  },
+                  onUpdate: (updatedElement) => {
+                    onUpdateElement(updatedElement);
+                  },
+                  onDelete: (element) => {
+                    onDeleteElement(element);
+                  },
+                })}
+              </Fragment>
+            );
+          })}
+        </Layer>
+        <Layer>
           {board?.pointers?.map((pointer) => {
             const user = getUserById(pointer.userId);
-            if (user) {
+            if (user && user.id != localUser!.id) {
               return (
                 <Pointer
                   key={`user_pointer_${pointer.userId}`}
@@ -176,53 +214,6 @@ export const Canvas = () => {
           })}
         </Layer>
       </Stage>
-
-      <div className='absolute inset-0 pointer-events-none overflow-hidden'>
-        <div
-          className='relative w-full h-full'
-          style={{
-            pointerEvents: 'auto',
-            transform: `translate(${stagePos.x}px, ${stagePos.y}px) scale(${stageScale})`,
-            transformOrigin: '0 0',
-          }}
-          onClick={(e) => {
-            // Снимаем выделение при клике на пустое место
-            if (e.target === e.currentTarget) {
-              setSelectedElementId(null);
-            }
-          }}
-        >
-          {board?.elements
-            .slice()
-            // .sort((a, b) => a.content.zIndex - b.zIndex)
-            .map((element) => {
-              const renderer = findRenderer(element);
-              if (!renderer) {
-                console.warn(`No renderer found for element: ${element.id}`);
-                return null;
-              }
-
-              return (
-                <Fragment key={element.id}>
-                  {renderer.render({
-                    element,
-                    isSelected: selectedElementId === element.id,
-                    onSelect: () => {
-                      onUpdateElement(element);
-                      setSelectedElementId(element.id);
-                    },
-                    onUpdate: (updatedElement) => {
-                      onUpdateElement(updatedElement);
-                    },
-                    onDelete: (elementId) => {
-                      onDeleteElement(element);
-                    },
-                  })}
-                </Fragment>
-              );
-            })}
-        </div>
-      </div>
     </div>
   );
 };

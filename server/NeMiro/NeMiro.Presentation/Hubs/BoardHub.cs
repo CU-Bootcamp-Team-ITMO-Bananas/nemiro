@@ -63,6 +63,12 @@ public class BoardHub : Hub
             await Groups.AddToGroupAsync(Context.ConnectionId, $"board-{boardId}", cancellationToken);
         }
 
+        var board = _boardService.GetBoardByIdAsync(boardId);
+        await Clients.Caller.SendAsync(
+            "BoardUpdate",
+            board,
+            cancellationToken: cancellationToken);
+
         await base.OnConnectedAsync();
     }
 
@@ -100,6 +106,13 @@ public class BoardHub : Hub
         var boardId = Context.Items["board_id"] as string;
 
         await _elementService.UpdateElement(element, boardId, cancellationToken);
+        var board = _boardService.GetBoardByIdAsync(boardId);
+
+        await Clients.OthersInGroup($"board-{boardId}")
+            .SendAsync(
+                "BoardUpdate",
+                board,
+                cancellationToken: cancellationToken);
     }
 
     public async Task DeleteElement(ElementDto element)
@@ -107,6 +120,14 @@ public class BoardHub : Hub
         var httpContext = Context.GetHttpContext();
         var cancellationToken = httpContext.RequestAborted;
         var boardId = Context.Items["board_id"] as string;
+
         await _elementService.DeleteElement(element, boardId, cancellationToken);
+        var board = _boardService.GetBoardByIdAsync(boardId);
+
+        await Clients.OthersInGroup($"board-{boardId}")
+            .SendAsync(
+                "BoardUpdate",
+                board,
+                cancellationToken: cancellationToken);
     }
 }

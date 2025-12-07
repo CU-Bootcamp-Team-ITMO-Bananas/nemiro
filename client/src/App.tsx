@@ -16,10 +16,10 @@ function App() {
           first_name: anonymous.username!,
           last_name: anonymous.username!,
           username: anonymous.username!,
+          photo_url: anonymous.avatar!,
           auth_date: 0,
           hash: '',
         });
-        console.log(newUser);
         if (newUser != null) {
           setUser(newUser);
         }

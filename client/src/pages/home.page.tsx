@@ -32,11 +32,11 @@ export const HomePage = () => {
         } else {
           const oldBoards = await getBoards();
           if (oldBoards != null && oldBoards.length > 0) {
-            navigate(`/${oldBoards[0]}`, { replace: true });
+            navigate(`/${oldBoards[0].id}`, { replace: true });
           }
 
           const newBoard = await createBoard();
-          if (newBoard != null) {
+          if (newBoard !== null && newBoard !== '') {
             navigate(`/${newBoard}`, { replace: true });
           }
         }

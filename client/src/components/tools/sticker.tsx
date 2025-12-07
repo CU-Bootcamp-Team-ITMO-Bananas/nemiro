@@ -1,14 +1,16 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { Group, Rect, Text } from 'react-konva';
+import Konva from 'konva';
 import { StickerElement } from '@/shared/interfaces/board/tools/sticker-element.interface';
-import { cn } from '@/lib/utils';
 import { STICKER_COLORS } from './sticker-config-menu';
 
 interface StickerProps {
   element: StickerElement;
   onUpdate?: (element: StickerElement) => void;
-  onDelete?: (elementId: string) => void;
+  onDelete?: (element: StickerElement) => void;
   isSelected?: boolean;
-  onSelect?: () => void;
+  onSelect?: (e: Konva.KonvaEventObject<MouseEvent>) => void;
+  stageScale?: number;
 }
 
 export const Sticker = ({
@@ -16,272 +18,205 @@ export const Sticker = ({
   onUpdate,
   isSelected = false,
   onSelect,
+  stageScale = 1,
 }: StickerProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [text, setText] = useState<string>(element.content?.text || '');
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const stickerRef = useRef<HTMLDivElement>(null);
+  const [tempText, setTempText] = useState<string>(element.content?.text || '');
+
+  const groupRef = useRef<Konva.Group>(null);
+  const textNodeRef = useRef<Konva.Text>(null);
 
   const content = element.content || { text: '' };
   const width = content.width ?? 200;
   const height = content.height ?? 200;
   const colorIndex = element.content.color ?? 0;
   const backgroundColor = STICKER_COLORS[colorIndex % STICKER_COLORS.length];
+  const fontSize = Math.max(14, 14 / stageScale);
 
-  // Автоматическое изменение размера textarea
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [text]);
-
-  // Синхронизация текста с элементом при изменении
+  // Синхронизация текста с элементом
   useEffect(() => {
     if (element.content?.text !== undefined) {
       setText(element.content.text);
+      setTempText(element.content.text);
     }
   }, [element.content?.text]);
 
-  // Фокус на textarea при начале редактирования
+  // Автоматический размер текста
   useEffect(() => {
-    if (isEditing && textareaRef.current) {
-      textareaRef.current.focus();
-      textareaRef.current.select();
+    if (textNodeRef.current && !isEditing) {
+      textNodeRef.current.width(width - 24); // Отступы по 12px с каждой стороны
     }
-  }, [isEditing]);
+  }, [width, isEditing, text]);
 
-  const handleTextChange = (newText: string) => {
-    setText(newText);
-    if (onUpdate) {
-      onUpdate({
-        id: element.id,
-        content: {
-          text: newText,
-          width: content.width,
-          height: content.height,
-          x: element.content.x,
-          y: element.content.y,
-          scale: element.content.scale,
-          rotation: element.content.rotation,
-          zIndex: element.content.zIndex,
-          color: element.content.color,
-        },
-      });
-    }
-  };
-
-  const handleBlur = () => {
-    setIsEditing(false);
-    // Убеждаемся, что текст сохранен при выходе из редактирования
-    if (onUpdate && text !== element.content?.text) {
-      onUpdate({
-        id: element.id,
-        content: {
-          text: text,
-          width: content.width,
-          height: content.height,
-          x: element.content.x,
-          y: element.content.y,
-          scale: element.content.scale,
-          rotation: element.content.rotation,
-          zIndex: element.content.zIndex,
-          color: element.content.color,
-        },
-      });
-    }
-  };
-
-  const handleDoubleClick = () => {
-    setIsEditing(true);
-  };
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    if (onSelect && !isDragging) {
-      onSelect();
-    }
-  };
-
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      // Не начинаем drag при клике на textarea
-      if ((e.target as HTMLElement).tagName === 'TEXTAREA') {
-        return;
-      }
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      setIsDragging(true);
-
-      // Вычисляем смещение мыши относительно элемента в координатах stage
-      const parent = stickerRef.current?.parentElement;
-      if (parent) {
-        const parentRect = parent.getBoundingClientRect();
-        const transform = getComputedStyle(parent).transform;
-        let scale = 1;
-        let translateX = 0;
-        let translateY = 0;
-
-        if (transform && transform !== 'none') {
-          const matrix = transform.match(/matrix\(([^)]+)\)/);
-          if (matrix) {
-            const values = matrix[1].split(',').map(parseFloat);
-            scale = values[0] || 1;
-            translateX = values[4] || 0;
-            translateY = values[5] || 0;
-          }
-        }
-
-        const relativeX = e.clientX - parentRect.left;
-        const relativeY = e.clientY - parentRect.top;
-
-        // Координаты мыши в системе координат stage
-        const stageMouseX = (relativeX - translateX) / scale;
-        const stageMouseY = (relativeY - translateY) / scale;
-
-        // Смещение относительно позиции элемента
-        setDragStart({
-          x: stageMouseX - element.content.x,
-          y: stageMouseY - element.content.y,
+  const handleTextChange = useCallback(
+    (newText: string) => {
+      if (onUpdate) {
+        onUpdate({
+          id: element.id,
+          content: {
+            ...content,
+            text: newText,
+          },
         });
       }
     },
-    [element.content.x, element.content.y]
+    [onUpdate, element.id, content]
   );
 
-  useEffect(() => {
-    if (!isDragging) return;
+  const handleDrag = useCallback(
+    (e: Konva.KonvaEventObject<DragEvent>) => {
+      if (!onUpdate) return;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!onUpdate || !stickerRef.current) return;
-
-      // Получаем родительский контейнер с transform
-      const parent = stickerRef.current.parentElement;
-      if (!parent) return;
-
-      const parentRect = parent.getBoundingClientRect();
-
-      // Получаем transform матрицу родительского контейнера
-      const transform = getComputedStyle(parent).transform;
-      let scale = 1;
-      let translateX = 0;
-      let translateY = 0;
-
-      if (transform && transform !== 'none') {
-        const matrix = transform.match(/matrix\(([^)]+)\)/);
-        if (matrix) {
-          const values = matrix[1].split(',').map(parseFloat);
-          scale = values[0] || 1;
-          translateX = values[4] || 0;
-          translateY = values[5] || 0;
-        }
-      }
-
-      // Вычисляем новую позицию в координатах stage
-      // Координаты мыши относительно родительского контейнера
-      const relativeX = e.clientX - parentRect.left;
-      const relativeY = e.clientY - parentRect.top;
-
-      // Преобразуем в координаты stage (учитывая transform родителя)
-      const newX = (relativeX - translateX) / scale - dragStart.x;
-      const newY = (relativeY - translateY) / scale - dragStart.y;
-
+      const node = e.target;
       onUpdate({
         id: element.id,
         content: {
-          text: element.content?.text ?? '',
-          width: element.content?.width,
-          height: element.content?.height,
-          x: Math.max(0, newX),
-          y: Math.max(0, newY),
-          scale: element.content.scale,
-          rotation: element.content.rotation,
-          zIndex: element.content.zIndex,
-          color: element.content.color,
+          ...content,
+          x: node.x(),
+          y: node.y(),
         },
       });
+    },
+    [onUpdate, element.id, content]
+  );
+
+  const handleClick = useCallback(
+    (e: Konva.KonvaEventObject<MouseEvent>) => {
+      e.cancelBubble = true;
+
+      if (onSelect) {
+        onSelect(e);
+      }
+    },
+    [onSelect]
+  );
+
+  const handleDblClick = useCallback(
+    (e: Konva.KonvaEventObject<MouseEvent>) => {
+      e.cancelBubble = true;
+      setIsEditing(true);
+    },
+    []
+  );
+
+  const handleBlur = useCallback(() => {
+    setIsEditing(false);
+    if (tempText !== text) {
+      handleTextChange(tempText);
+    }
+  }, [tempText, text, handleTextChange]);
+
+  // Обработка нажатий клавиш в режиме редактирования
+  useEffect(() => {
+    if (!isEditing) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setTempText(text);
+        setIsEditing(false);
+      } else if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleBlur();
+      }
     };
 
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, dragStart, element, onUpdate]);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isEditing, text, handleBlur]);
 
   return (
-    <div
-      ref={stickerRef}
-      className={cn(
-        'absolute select-none',
-        isDragging ? 'cursor-grabbing' : 'cursor-move'
-      )}
-      style={{
-        left: `${element.content.x}px`,
-        top: `${element.content.y}px`,
-        transform: `rotate(${element.content.rotation}deg) scale(${element.content.scale})`,
-        zIndex: element.content.zIndex,
-        width: `${width}px`,
-        height: `${height}px`,
-        userSelect: 'none',
-      }}
-      onMouseDown={handleMouseDown}
-      onClick={handleClick}
-      onDoubleClick={handleDoubleClick}
-    >
-      <div
-        className={cn(
-          'relative w-full h-full rounded-lg shadow-md transition-shadow hover:shadow-lg',
-          isSelected && 'ring-2 ring-blue-500'
-        )}
-        style={{
-          backgroundColor,
-        }}
+    <>
+      <Group
+        ref={groupRef}
+        x={content.x}
+        y={content.y}
+        width={width}
+        height={height}
+        rotation={content.rotation || 0}
+        scaleX={content.scale || 1}
+        scaleY={content.scale || 1}
+        draggable
+        onClick={handleClick}
+        onDblClick={handleDblClick}
+        onDragMove={handleDrag}
       >
-        <div className='w-full h-full flex items-center justify-center text-center p-3'>
-          {isEditing ? (
-            <textarea
-              ref={textareaRef}
-              value={text}
-              onChange={(e) => handleTextChange(e.target.value)}
-              onBlur={handleBlur}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleBlur();
-                }
-                if (e.key === 'Escape') {
-                  handleBlur();
-                }
-              }}
-              className='w-full h-full bg-transparent border-none outline-none resize-none text-gray-900 font-medium text-sm leading-tight text-center'
-              style={{
-                minHeight: '60px',
-              }}
-              placeholder='Введите текст...'
-            />
-          ) : (
-            <div className='text-gray-900 font-medium text-sm leading-tight whitespace-pre-wrap break-words'>
-              {text || (
-                <span className='text-gray-500 italic'>
-                  Дважды кликните для редактирования
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+        {/* Фон стикера */}
+        <Rect
+          width={width}
+          height={height}
+          fill={backgroundColor}
+          cornerRadius={8}
+          shadowColor='rgba(0, 0, 0, 0.1)'
+          shadowBlur={5}
+          shadowOffset={{ x: 0, y: 2 }}
+          shadowOpacity={0.8}
+          stroke={isSelected ? '#3b82f6' : undefined}
+          strokeWidth={isSelected ? 2 : 0}
+        />
+
+        {/* Текст стикера */}
+        {isEditing ? (
+          // Поле ввода для редактирования
+          <Rect
+            width={width - 24}
+            height={height - 24}
+            x={12}
+            y={12}
+            fill='transparent'
+          />
+        ) : (
+          <Text
+            ref={textNodeRef}
+            x={12}
+            y={12}
+            width={width - 24}
+            height={height - 24}
+            text={text || 'Дважды кликните для редактирования'}
+            fill={text ? '#1f2937' : '#6b7280'}
+            fontSize={fontSize}
+            fontStyle={!text ? 'italic' : 'normal'}
+            fontFamily='Inter, system-ui, sans-serif'
+            fontWeight='500'
+            align='center'
+            verticalAlign='middle'
+            wrap='word'
+            lineHeight={1.4}
+            padding={8}
+          />
+        )}
+      </Group>
+
+      {/* Скрытый textarea для редактирования текста */}
+      {isEditing && (
+        <textarea
+          value={tempText}
+          onChange={(e) => setTempText(e.target.value)}
+          onBlur={handleBlur}
+          autoFocus
+          style={{
+            position: 'absolute',
+            left: `${content.x * stageScale + 12 * stageScale}px`,
+            top: `${content.y * stageScale + 12 * stageScale}px`,
+            width: `${(width - 24) * stageScale}px`,
+            height: `${(height - 24) * stageScale}px`,
+            fontSize: `${fontSize * stageScale}px`,
+            lineHeight: 1.4,
+            padding: `${8 * stageScale}px`,
+            fontFamily: 'Inter, system-ui, sans-serif',
+            fontWeight: 500,
+            textAlign: 'center',
+            backgroundColor: 'transparent',
+            border: '1px solid #3b82f6',
+            borderRadius: '4px',
+            outline: 'none',
+            resize: 'none',
+            zIndex: 9999,
+            transformOrigin: 'top left',
+            transform: `scale(${1 / stageScale})`,
+          }}
+        />
+      )}
+    </>
   );
 };

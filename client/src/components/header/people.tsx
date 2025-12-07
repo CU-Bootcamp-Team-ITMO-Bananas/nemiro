@@ -1,5 +1,6 @@
 import { useBoardStore } from '@/shared/stores/board.store';
 import { Avatar, AvatarImage } from '@radix-ui/react-avatar';
+import { AvatarFallback } from '../ui/avatar';
 
 export const People = () => {
   const { board } = useBoardStore();
@@ -9,6 +10,7 @@ export const People = () => {
       {board?.users.forEach((u) => (
         <Avatar>
           <AvatarImage src={u.avatar ?? ''} alt={u.username ?? ''} />
+          <AvatarFallback>{u.username?.toUpperCase()[0]}</AvatarFallback>
         </Avatar>
       ))}
     </>

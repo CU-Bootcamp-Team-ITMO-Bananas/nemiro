@@ -20,7 +20,8 @@ export const anonymousUser = (): User => {
   return {
     id: Math.floor(Math.random() * 10 ** 5),
     username: uniqueNamesGenerator({
-      dictionaries: [names, adjectives, animals],
+      style: 'capital',
+      dictionaries: [adjectives, names, animals],
       length: 2,
       separator: ' ',
     }),

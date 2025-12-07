@@ -5,7 +5,7 @@ import { ReactNode } from 'react';
 export interface ElementRendererProps {
   element: BoardElement;
   onUpdate: (element: BoardElement) => void;
-  onDelete?: (elementId: string) => void;
+  onDelete?: (element: BoardElement) => void;
   isSelected?: boolean;
   onSelect?: () => void;
 }
