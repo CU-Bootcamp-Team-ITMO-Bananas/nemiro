@@ -1,7 +1,7 @@
 import { BoardElement } from '../board-element.interface';
 
-export interface StickerContent {
-  type: 'sticker';
+export interface TextContent {
+  type: 'text';
   x: number;
   y: number;
   scale: number;
@@ -13,6 +13,6 @@ export interface StickerContent {
   height?: number;
 }
 
-export interface StickerElement extends BoardElement {
-  content: StickerContent;
+export interface TextElement extends BoardElement {
+  content: TextContent;
 }

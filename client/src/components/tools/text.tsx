@@ -1,8 +1,7 @@
 import Konva from 'konva';
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Group, Rect, Text } from 'react-konva';
+import { Group, Text } from 'react-konva';
 import { StickerElement } from '@/shared/interfaces/board/tools/sticker-element.interface';
-import { STICKER_COLORS } from './sticker-config-menu';
 import { TextEditor } from './text-editor';
 
 interface StickerProps {
@@ -28,8 +27,6 @@ export const Sticker = ({
   const content = element.content || { text: '' };
   const width = content.width ?? 200;
   const height = content.height ?? 200;
-  const colorIndex = element.content?.color ?? 0;
-  const backgroundColor = STICKER_COLORS[colorIndex % STICKER_COLORS.length];
   const fontSize = Math.max(14, 14 / stageScale);
   const text = content.text || '';
 
@@ -108,20 +105,6 @@ export const Sticker = ({
         onDblClick={handleDblClick}
         onDragMove={handleDrag}
       >
-        {/* Фон стикера */}
-        <Rect
-          width={width}
-          height={height}
-          fill={backgroundColor}
-          cornerRadius={8}
-          shadowColor='rgba(0, 0, 0, 0.1)'
-          shadowBlur={5}
-          shadowOffset={{ x: 0, y: 2 }}
-          shadowOpacity={0.8}
-          stroke={isSelected ? '#3b82f6' : undefined}
-          strokeWidth={isSelected ? 2 : 0}
-        />
-
         {/* Текст стикера */}
         <Text
           ref={textNodeRef}
