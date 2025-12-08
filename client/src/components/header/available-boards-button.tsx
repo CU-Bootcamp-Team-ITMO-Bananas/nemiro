@@ -1,10 +1,25 @@
 import { useState } from 'react';
-import logo from '../../assets/logo.svg';
 import { Badge } from '../ui/badge';
 import { AvailableBoards } from '@/modules/available-boards.module';
+import { createBoard } from '@/shared/api/boards.api';
+import { useNavigate } from 'react-router-dom';
 
 export const AvailableBoardsButton = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleBoardCreationClick = async () => {
+    setIsOpen(false)
+    try {
+      const board = await createBoard();
+      if (board) {
+        navigate(`/${board}`, { replace: true });
+      }
+    } catch (error) {
+      console.error('Error initializing board:', error);
+    }
+  }
+
   return (
     <>
     <button 
@@ -17,7 +32,7 @@ export const AvailableBoardsButton = () => {
           variant='secondary'
           className='bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600'
         >
-          Доступные доски
+          Доски
         </Badge>
       </div>
     </button>
@@ -29,6 +44,16 @@ export const AvailableBoardsButton = () => {
         >
           <div className="modal-header">
             <h2>Выберите доску</h2>
+            <button 
+              className="modal-close"
+              onClick={handleBoardCreationClick}
+              aria-label="Создать доску"
+            >
+              <Badge
+                variant='secondary'
+                className='bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600'
+              >Новая доска</Badge>
+            </button>
             <button 
               className="modal-close"
               onClick={() => setIsOpen(false)}
